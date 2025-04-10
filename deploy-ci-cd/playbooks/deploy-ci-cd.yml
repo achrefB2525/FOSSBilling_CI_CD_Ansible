@@ -1,0 +1,48 @@
+---
+- name: Déploiement complet CI/CD avec Jenkins, SonarQube, Nexus, PostgreSQL et installation de Trivy
+  hosts: localhost
+  become: yes 
+  vars_files:
+     - vars/vars.yml 
+     - vars/passwordvars.yml 
+  tasks:
+    - name: Se connecter à Docker Registry Red Hat
+      shell: docker login registry.redhat.io -u {{ docker_username }} -p {{ docker_password }}
+      register: docker_login_output
+      ignore_errors: yes
+
+    - name: Vérifier la connexion à Docker
+      fail:
+        msg: "La connexion à Docker a échoué"
+      when: docker_login_output.rc != 0
+
+
+    - name: Vérifier la connexion à OpenShift
+      fail:
+        msg: "La connexion à OpenShift a échoué"
+      when: login_output.rc != 0
+
+    - name: Déployer Jenkins depuis jenkinsdeploy.yaml
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
+      when: login_output.rc == 0           
+    
+    - name: Inclure les tâches de déploiement de PostgreSQL
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/postgres.yaml
+      when: login_output.rc == 0
+
+    - name: Déployer SonarQube depuis sonar.yaml
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar.yaml
+      when: login_output.rc == 0
+     
+    - name: Déployer Nexus depuis deplo_nexus.yaml
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/nexus/deplo_nexus.yaml
+      when: login_output.rc == 0
+
+    - name: Inclure les tâches pour installer Trivy
+      include_tasks: "{{ deploy_path }}/deploy-ci-cd/security/installTrivy.yaml"
+      when: login_output.rc == 0
+
+    - name: Inclure les tâches pour la gestion des plugins Jenkins
+      include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/mangerPlugins.yml"
+      when: login_output.rc == 0
+
