@@ -5,7 +5,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: default  
-    namespace: 3spfe 
+    namespace: jenkins
 roleRef:
   kind: ClusterRole
   name: clusterrole-namespace-deployment  
