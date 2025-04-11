@@ -44,30 +44,12 @@ spec:
     spec:
       containers:
         - name: jenkins
-          image: docker-registry.default.svc:5000/openshift/jenkins
-          imagePullPolicy: IfNotPresent 
+          image: jenkins/jenkins:lts  
           ports:
             - name: http-port
               containerPort: 8080
             - name: agent
               containerPort: 50000
-          env:
-            - name: OPENSHIFT_ENABLE_OAUTH
-              value: 'false'
-            - name: OPENSHIFT_ENABLE_REDIRECT_PROMPT
-              value: 'true'
-            - name: DISABLE_ADMINISTRATIVE_MONITORS
-              value: 'false'
-            - name: KUBERNETES_MASTER
-              value: 'https://kubernetes.default:443'
-            - name: KUBERNETES_TRUST_CERTIFICATES
-              value: 'true'
-            - name: JENKINS_SERVICE_NAME
-              value: jenkins
-            - name: JNLP_SERVICE_NAME
-              value: jenkins-jnlp
-            - name: JENKINS_OPTS
-              value: "--httpPort=8080 --httpListenAddress=0.0.0.0"
           volumeMounts:
             - name: jenkins-data
               mountPath: /var/jenkins_home
@@ -101,8 +83,6 @@ spec:
   ports:
     - name: agent
       port: 50000
-      protocol: TCP
       targetPort: 50000
   selector:
     app: jenkins
-
