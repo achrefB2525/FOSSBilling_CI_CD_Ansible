@@ -1,0 +1,100 @@
+---
+- name: Installer Docker et dépendances
+  hosts: localhost
+  become: yes
+  tasks:
+    # 1. Nettoyage complet des anciennes installations
+    - name: Supprimer les paquets conflictuels
+      apt:
+        name:
+          - docker
+          - docker-engine
+          - docker.io
+          - containerd
+          - runc
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: absent
+        purge: yes
+        autoremove: yes
+      ignore_errors: yes
+
+    - name: Ajouter la clé GPG
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Ajouter le dépôt
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+        update_cache: yes
+
+    # 3. Installer les dépendances de base
+    - name: Installer les prérequis
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - containerd.io  # Forcer la version du dépôt Docker
+        state: present
+        force_apt_get: yes
+
+    # 4. Installer Docker CE avec gestion des conflits
+    - name: Installer Docker CE
+      apt:
+        name:
+          - "docker-ce={{ docker_version }}"
+          - "docker-ce-cli={{ docker_version }}"
+        state: present
+        force_apt_get: yes
+        install_recommends: no
+      register: install_result
+      retries: 3
+      delay: 10
+      until: install_result is succeeded
+
+    # 5. Configuration finale
+    - name: Redémarrer Docker
+      systemd:
+        name: docker
+        state: restarted
+
+    - name: Configurer les permissions
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+    - name: Créer le répertoire .kube
+      file:
+        path: "{{ ansible_user_dir }}/.kube"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    # 6. Installer Minikube
+    - name: Télécharger Minikube
+      get_url:
+        url: "https://storage.googleapis.com/minikube/releases/v{{ minikube_version }}/minikube-linux-amd64"
+        dest: /usr/local/bin/minikube
+        mode: "0755"
+
+    # 7. Installer kubectl
+    - name: Installer kubectl
+      snap:
+        name: kubectl
+        classic: yes
+        state: present
+    - name: Démarrer Minikube avec Docker
+      command: minikube start --driver=docker --force
+      become: yes
+      become_user: "{{ ansible_user }}"
+      environment:
+        HOME: "{{ ansible_user_dir }}"
+        KUBECONFIG: "{{ ansible_user_dir }}/.kube/config"
+      args:
+        chdir: "{{ ansible_user_dir }}"
+

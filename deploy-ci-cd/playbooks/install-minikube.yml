@@ -1,0 +1,143 @@
+---
+- name: Installer Docker et dépendances
+  hosts: localhost
+  become: yes
+  tasks:
+    # 1. Nettoyage complet des anciennes installations
+    - name: Supprimer les paquets conflictuels
+      apt:
+        name:
+          - docker
+          - docker-engine
+          - docker.io
+          - containerd
+          - runc
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: absent
+        purge: yes
+        autoremove: yes
+      ignore_errors: yes
+
+    - name: Installer les paquets requis
+      apt:
+        name:
+          - curl
+          - apt-transport-https
+          - ca-certificates
+          - software-properties-common
+          - python3-pip
+        state: present
+    - name: Ajouter la clé GPG
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Ajouter le dépôt
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+        update_cache: yes
+
+
+    - name: Installer Docker CE
+      apt:
+        name:
+          - "docker-ce={{ docker_version }}"
+          - "docker-ce-cli={{ docker_version }}"
+          - containerd.io
+        state: present
+        force_apt_get: yes
+        install_recommends: no
+      register: install_result
+      retries: 3
+      delay: 10
+      until: install_result is succeeded
+
+    - name: Configurer les permissions Docker
+      block:
+      - name: Vérifier les permissions du socket Docker
+        file:
+          path: /var/run/docker.sock
+          owner: root
+          group: docker
+          mode: '0777'
+
+    - name: Installer le SDK Docker
+      pip:
+        name: docker
+        executable: pip3
+
+    - name: Redémarrer Docker avec les nouvelles permissions
+      systemd:
+        name: docker
+        state: restarted
+
+    - name: Actualiser les groupes utilisateur
+      shell: sudo usermod -aG docker $USER && newgrp docker -c "echo Groupes actualisés"
+      changed_when: false
+    - name: Configurer les permissions user
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+    - name: Créer le répertoire .kube
+      file:
+        path: "{{ ansible_user_dir }}/.kube"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+    
+    - name: Télécharger manuellement l'image kicbase
+      docker_image:
+        name: docker.io/kicbase/stable:v0.0.42
+        source: pull
+        force_source: yes
+
+    - name: Télécharger Minikube
+      get_url:
+        url: "https://storage.googleapis.com/minikube/releases/v{{ minikube_version }}/minikube-linux-amd64"
+        dest: /usr/local/bin/minikube
+        mode: "0755"
+
+    # 7. Installer kubectl
+    - name: Installer kubectl
+      snap:
+        name: kubectl
+        classic: yes
+        state: present
+    - name: Préparer environnement Minikube
+      block:
+        - name: Créer répertoire .minikube
+          file:
+            path: "{{ ansible_user_dir }}/.minikube/machines/minikube"
+            state: directory
+            owner: "{{ ansible_user }}"
+            group: "{{ ansible_user }}"
+            mode: '0755'  
+
+    - name: Supprimer les anciennes clés SSH si elles existent
+      file:
+        path: "{{ ansible_user_dir }}/.minikube/machines/minikube/id_rsa"
+        state: absent
+      ignore_errors: yes
+
+    - name: Générer de nouvelles clés SSH
+      community.crypto.openssh_keypair:
+        path: "{{ ansible_user_dir }}/.minikube/machines/minikube/id_rsa"
+        type: rsa
+        size: 4096
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0600'
+
+    - name: Installer Minikube
+      get_url:
+        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        dest: /usr/local/bin/minikube
+        mode: '0755'
+
+    - name: Démarrer Minikube
+      command: minikube start --driver=docker 
+      become: false
