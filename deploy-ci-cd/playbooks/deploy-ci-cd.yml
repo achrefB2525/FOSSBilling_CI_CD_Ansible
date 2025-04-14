@@ -23,7 +23,7 @@
 
     - name: Vérifier que le serveur Jenkins est prêt
       uri:
-        url: {{ jenkins_url }}
+        url: "{{ jenkins_url }}"
         status_code: 200
         return_content: yes
       register: jenkins_check
