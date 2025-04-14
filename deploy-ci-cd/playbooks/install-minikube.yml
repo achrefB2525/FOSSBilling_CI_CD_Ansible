@@ -1,25 +1,15 @@
----
-- name: Installer Docker et dépendances
+- name: Installer Docker, Minikube et cri-dockerd
   hosts: localhost
   become: yes
-  tasks:
-    # 1. Nettoyage complet des anciennes installations
-    - name: Supprimer les paquets conflictuels
-      apt:
-        name:
-          - docker
-          - docker-engine
-          - docker.io
-          - containerd
-          - runc
-          - docker-buildx-plugin
-          - docker-compose-plugin
-        state: absent
-        purge: yes
-        autoremove: yes
-      ignore_errors: yes
+  vars:
+    docker_version: "5:20.10.24~3-0~ubuntu-focal"
+    minikube_version: "1.32.0"
+    user_home: "/home/achref"
+    user_name: "achref"
 
-    - name: Installer les paquets requis
+  tasks:
+
+    - name: Installer les dépendances système
       apt:
         name:
           - curl
@@ -27,18 +17,22 @@
           - ca-certificates
           - software-properties-common
           - python3-pip
+          - conntrack
+          - socat
+          - ebtables
+          - iptables
         state: present
-    - name: Ajouter la clé GPG
+
+    - name: Ajouter la clé GPG Docker
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
 
-    - name: Ajouter le dépôt
+    - name: Ajouter le dépôt Docker
       apt_repository:
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
         state: present
         update_cache: yes
-
 
     - name: Installer Docker CE
       apt:
@@ -47,53 +41,49 @@
           - "docker-ce-cli={{ docker_version }}"
           - containerd.io
         state: present
-        force_apt_get: yes
-        install_recommends: no
-      register: install_result
-      retries: 3
-      delay: 10
-      until: install_result is succeeded
 
-    - name: Configurer les permissions Docker
-      block:
-      - name: Vérifier les permissions du socket Docker
-        file:
-          path: /var/run/docker.sock
-          owner: root
-          group: docker
-          mode: '0777'
+    - name: Redémarrer Docker
+      systemd:
+        name: docker
+        state: restarted
+        enabled: true
 
-    - name: Installer le SDK Docker
+    - name: Ajouter l’utilisateur {{ user_name }} au groupe docker
+      user:
+        name: "{{ user_name }}"
+        groups: docker
+        append: yes
+
+    - name: Installer le SDK Docker pour Python
       pip:
         name: docker
         executable: pip3
 
-    - name: Redémarrer Docker avec les nouvelles permissions
-      systemd:
-        name: docker
-        state: restarted
+    - name: Télécharger et installer crictl
+      block:
+        - name: Télécharger crictl
+          get_url:
+            url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.28.0/crictl-v1.28.0-linux-amd64.tar.gz"
+            dest: "/tmp/crictl.tar.gz"
 
-    - name: Actualiser les groupes utilisateur
-      shell: sudo usermod -aG docker $USER && newgrp docker -c "echo Groupes actualisés"
-      changed_when: false
-    - name: Configurer les permissions user
-      user:
-        name: "{{ ansible_user }}"
-        groups: docker
-        append: yes
-    - name: Créer le répertoire .kube
-      file:
-        path: "{{ ansible_user_dir }}/.kube"
-        state: directory
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: '0755'
-    
-    - name: Télécharger manuellement l'image kicbase
-      docker_image:
-        name: docker.io/kicbase/stable:v0.0.42
-        source: pull
-        force_source: yes
+        - name: Extraire crictl
+          unarchive:
+            src: "/tmp/crictl.tar.gz"
+            dest: "/usr/local/bin/"
+            remote_src: yes
+
+        - name: Rendre crictl exécutable
+          file:
+            path: "/usr/local/bin/crictl"
+            mode: '0755'
+            state: file
+
+
+    - name: Activer et démarrer cri-dockerd
+      systemd:
+        name: cri-docker
+        state: started
+        enabled: true
 
     - name: Télécharger Minikube
       get_url:
@@ -101,43 +91,7 @@
         dest: /usr/local/bin/minikube
         mode: "0755"
 
-    # 7. Installer kubectl
-    - name: Installer kubectl
-      snap:
-        name: kubectl
-        classic: yes
-        state: present
-    - name: Préparer environnement Minikube
-      block:
-        - name: Créer répertoire .minikube
-          file:
-            path: "{{ ansible_user_dir }}/.minikube/machines/minikube"
-            state: directory
-            owner: "{{ ansible_user }}"
-            group: "{{ ansible_user }}"
-            mode: '0755'  
+    - name: Démarrer Minikube avec l'utilisateur {{ user_name }}
+      command: minikube start --driver=none --kubernetes-version=v1.32.0
+      become: false  # Exécute la commande en tant qu'utilisateur non-root (achref)
 
-    - name: Supprimer les anciennes clés SSH si elles existent
-      file:
-        path: "{{ ansible_user_dir }}/.minikube/machines/minikube/id_rsa"
-        state: absent
-      ignore_errors: yes
-
-    - name: Générer de nouvelles clés SSH
-      community.crypto.openssh_keypair:
-        path: "{{ ansible_user_dir }}/.minikube/machines/minikube/id_rsa"
-        type: rsa
-        size: 4096
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: '0600'
-
-    - name: Installer Minikube
-      get_url:
-        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-        dest: /usr/local/bin/minikube
-        mode: '0755'
-
-    - name: Démarrer Minikube
-      command: minikube start --driver=docker 
-      become: false

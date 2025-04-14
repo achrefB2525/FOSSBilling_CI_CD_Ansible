@@ -1,32 +1,35 @@
 ---
 - name: Déploiement complet CI/CD avec Jenkins, SonarQube, Nexus, PostgreSQL et installation de Trivy
-  hosts: localhost
-  become: yes 
+  hosts: localhost 
   vars_files:
-     - vars/vars.yml 
      - vars/passwordvars.yml 
   tasks:
+   
     - name: Déployer Jenkins depuis jenkinsdeploy.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
-      when: login_output.rc == 0           
-    
+
     - name: Inclure les tâches de déploiement de PostgreSQL
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/postgres.yaml
-      when: login_output.rc == 0
+
 
     - name: Déployer SonarQube depuis sonar.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar.yaml
-      when: login_output.rc == 0
      
     - name: Déployer Nexus depuis deplo_nexus.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/nexus/deplo_nexus.yaml
-      when: login_output.rc == 0
 
     - name: Inclure les tâches pour installer Trivy
-      include_tasks: "{{ deploy_path }}/deploy-ci-cd/security/installTrivy.yaml"
-      when: login_output.rc == 0
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/security/DeployTrivy.yaml
+
+    - name: Vérifier que le serveur Jenkins est prêt
+      uri:
+        url: {{ jenkins_url }}
+        status_code: 200
+        return_content: yes
+      register: jenkins_check
+      retries: 10
+      delay: 15
+      until: jenkins_check.status == 200
 
     - name: Inclure les tâches pour la gestion des plugins Jenkins
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/mangerPlugins.yml"
-      when: login_output.rc == 0
-

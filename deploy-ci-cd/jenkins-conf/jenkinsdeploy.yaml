@@ -1,3 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jenkins-admin
+rules:
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["*"]
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -13,7 +22,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/jenkins
+    path: /mnt
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -26,6 +35,29 @@ spec:
   resources:
     requests:
       storage: 5Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jenkins-init-groovy
+  namespace: jenkins
+data:
+  reset-password.groovy: |
+    import jenkins.model.*
+    import hudson.security.*
+
+    def instance = Jenkins.getInstance()
+
+    // Activer la sécurité si ce n’est pas déjà le cas
+    def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+    hudsonRealm.createAccount("admin", "password")
+    instance.setSecurityRealm(hudsonRealm)
+
+    def strategy = new FullControlOnceLoggedInAuthorizationStrategy()
+    strategy.setAllowAnonymousRead(false)
+    instance.setAuthorizationStrategy(strategy)
+
+    instance.save()
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -44,19 +76,27 @@ spec:
     spec:
       containers:
         - name: jenkins
-          image: jenkins/jenkins:lts  
+          image: jenkins/jenkins:lts
           ports:
             - name: http-port
               containerPort: 8080
             - name: agent
               containerPort: 50000
+          env:
+            - name: JAVA_OPTS
+              value: "-Djenkins.install.runSetupWizard=false"
           volumeMounts:
             - name: jenkins-data
               mountPath: /var/jenkins_home
+            - name: jenkins-init-scripts
+              mountPath: /var/jenkins_home/init.groovy.d
       volumes:
         - name: jenkins-data
           persistentVolumeClaim:
             claimName: jenkins-pvc
+        - name: jenkins-init-scripts
+          configMap:
+            name: jenkins-init-groovy
 ---
 apiVersion: v1
 kind: Service
@@ -86,3 +126,4 @@ spec:
       targetPort: 50000
   selector:
     app: jenkins
+

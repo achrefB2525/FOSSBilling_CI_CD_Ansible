@@ -1,0 +1,10 @@
+---
+- name: Deploy Minikube via GitHub Clone
+  hosts: all
+  become: yes
+  vars:
+    minikube_driver: "none"
+    minikube_version: "1.32.0"
+
+  roles:
+    - role: robertdebock.minikube  # Chemin relatif au dossier "roles/"

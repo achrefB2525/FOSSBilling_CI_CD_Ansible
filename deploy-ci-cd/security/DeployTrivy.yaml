@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: security
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sape
+  namespace: security
+  labels:
+    app: trivy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trivy
+  template:
+    metadata:
+      labels:
+        app: trivy
+    spec:
+      containers:
+        - name: trivy
+          image: aquasec/trivy:latest
+          command: [ "sleep" ]
+          args: [ "infinity" ]
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sape-service
+  namespace: security
+spec:
+  type: NodePort
+  selector:
+    app: trivy
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30036  # Tu peux choisir un autre port entre 30000-32767

@@ -1,15 +1,22 @@
 
     - name: Télécharger jenkins-cli.jar avec curl
-      shell: curl -o {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar http://{{ host_ip }}:30080/jnlpJars/jenkins-cli.jar
+      shell: >
+        curl -o {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        {{ jenkins_url }}/jnlpJars/jenkins-cli.jar
       args:
-        creates:{{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+       creates: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar"
       register: jenkins_cli
 
-    
-
-    - name: Mettre à jour les plugins Jenkins avec un script Groovy
-      shell: |
-        curl --user 'admin:password' --data-urlencode "script=$(< {{ deploy_path }}/deploy-ci-cd/jenkins-conf/update_plugins.groovy)" http://{{ host_ip }}:30080/scriptText
+    - name: Mettre à jour les plugins Jenkins avec le CLI
+      shell: >
+         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+         -s {{ jenkins_url }}
+         -auth admin:{{ jenkins_password }}
+          groovy =
+          < {{ deploy_path }}/deploy-ci-cd/jenkins-conf/update_plugins.groovy
+          > {{ deploy_path }}/deploy-ci-cd/jenkins-conf/plugins.txt
+      args:
+        executable: /bin/bash
       register: update_plugins_result
 
     - name: Afficher le résultat de la mise à jour des plugins
@@ -17,20 +24,57 @@
         var: update_plugins_result.stdout
 
     - name: Installer le plugin Git
-      command: java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s http://{{ host_ip }}:30080/ -auth admin:password install-plugin git
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin git
+      args:
+        executable: /bin/bash
 
     - name: Installer le plugin Maven Integration
-      command: java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s http://{{ host_ip }}:30080/ -auth admin:password install-plugin maven-plugin
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin maven-plugin
+      args:
+        executable: /bin/bash
 
-    - name: Installer le plugin Workflow Aggregator
-      command: java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s http://{{ host_ip }}:30080/ -auth admin:password install-plugin workflow-aggregator
+    - name: Installer le plugin Pipeline
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin workflow-aggregator
+      args:
+        executable: /bin/bash
 
-    - name: Installer le plugin SonarQube Scanner
-      command: java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s http://{{ host_ip }}:30080/ -auth admin:password install-plugin sonar
-    
-    - name: Installer le plugin Ssh Server
-      command: java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s http://{{ host_ip }}:30080/ -auth admin:password install-plugin   publish-over-ssh
+    - name: Installer le plugin Kubernetes
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin kubernetes
+      args:
+        executable: /bin/bash
 
-    - name: Redémarrer Jenkins pour appliquer les modifications des plugins
-      command: java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s http://{{ host_ip }}:30080/ -auth admin:password restart
+    - name: Installer le plugin  Jenkins Configuration as Code (JCasC) 
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin configuration-as-code
+      args:
+        executable: /bin/bash
+
+
+    - name: Redémarrer Jenkins pour activer les plugins (si besoin)
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        safe-restart
+      args:
+        executable: /bin/bash 
 
