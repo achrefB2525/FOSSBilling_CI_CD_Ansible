@@ -12,7 +12,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                 container('docker'){
+                 container('php-cli'){
                 sh 'composer install --no-interaction'
                  }
             }
@@ -20,7 +20,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                // Si FOSSBilling a des tests PHPUnit
+              
                 sh './vendor/bin/phpunit || true'
             }
         }
