@@ -20,16 +20,10 @@
 
     - name: Inclure les tâches pour installer Trivy
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/security/DeployTrivy.yaml
-
-    - name: Vérifier que le serveur Jenkins est prêt
-      uri:
-        url: "{{ jenkins_url }}"
-        status_code: 200
-        return_content: yes
-      register: jenkins_check
-      retries: 10
-      delay: 15
-      until: jenkins_check.status == 200
+ 
+    - name: Ajouter un délai de 60 secondes
+      pause:
+        seconds: 60
 
     - name: Inclure les tâches pour la gestion des plugins Jenkins
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/mangerPlugins.yml"
