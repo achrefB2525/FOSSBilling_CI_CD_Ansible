@@ -3,7 +3,7 @@
       command: >
         curl -u admin:{{ sonar_current_password }} -X POST
         --header "Content-Type: application/x-www-form-urlencoded"
-        "http://{{ host_ip }}:30090/api/users/change_password"
+        "http://{{ sonar_url }}/api/users/change_password"
         -d "login=admin&password={{ sonar_new_password }}&previousPassword={{ sonar_current_password }}"
       register: change_password_response
       ignore_errors: yes
@@ -15,7 +15,7 @@
     - name: Delete existing SonarQube token
       command: >
         curl -u admin:{{ sonar_new_password }} -X POST
-        "http://{{ host_ip }}:30090/api/user_tokens/revoke?name={{ sonar_token_name }}&login=admin"
+        "http://{{ sonar_url }}/api/user_tokens/revoke?name={{ sonar_token_name }}&login=admin"
       ignore_errors: yes  
       register: delete_token_response
 
@@ -27,7 +27,7 @@
     - name: Generate SonarQube token
       command: >
         curl -u admin:{{ sonar_new_password }} -X POST
-        "http://{{ host_ip }}:30090/api/user_tokens/generate"
+        "http://{{ sonar_url }}/api/user_tokens/generate"
         -d "name={{ sonar_token_name }}"
       register: token_response
       ignore_errors: yes  

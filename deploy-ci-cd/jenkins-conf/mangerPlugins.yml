@@ -32,12 +32,23 @@
       args:
         executable: /bin/bash
 
+
     - name: Installer le plugin Maven Integration
       shell: >
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
         -s {{ jenkins_url }}
         -auth admin:{{ jenkins_password }}
         install-plugin maven-plugin
+      args:
+        executable: /bin/bash
+
+
+    - name: Installer le plugin SonarqubeScanner
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin sonar
       args:
         executable: /bin/bash
 
@@ -59,6 +70,34 @@
       args:
         executable: /bin/bash
 
+    - name: Installer le plugin   Matrix Authorization Strategy Plugin 
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin   matrix-auth
+      args:
+        executable: /bin/bash
+
+    - name: Installer le plugin  Jenkins Configuration as Code (JCasC) 
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin favorite-view
+      args:
+        executable: /bin/bash
+
+    - name: Installer le  favorite
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin favorite-view
+      args:
+        executable: /bin/bash
+
+
     - name: Installer le plugin  Jenkins Configuration as Code (JCasC) 
       shell: >
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
@@ -67,6 +106,77 @@
         install-plugin configuration-as-code
       args:
         executable: /bin/bash
+
+    - name: Installer le plugin    subversion
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin   subversion
+      args:
+        executable: /bin/bash
+
+    - name: Installer le plugin cloudbees-bitbucket-branch-source 
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin  cloudbees-bitbucket-branch-source
+      args:
+        executable: /bin/bash
+
+    - name: Installer le  github-branch-source
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin  github-branch-source
+      args:
+        executable: /bin/bash
+
+   - name: Installer le plugin  bitbucket
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin   bitbucket
+      args:
+        executable: /bin/bash
+
+    - name: Installer le plugin  github
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin  github
+      args:
+        executable: /bin/bash
+
+    - name: Installer le  plugin prometheus
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin prometheus
+      args:
+        executable: /bin/bash
+
+
+
+
+    - name: Installer le plugin  Email Extension	
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin  email-ext
+      args:
+        executable: /bin/bash
+
+
+    - name: Ajouter un délai de 60 secondes
+      pause:
+        seconds: 60
 
 
     - name: Redémarrer Jenkins pour activer les plugins (si besoin)

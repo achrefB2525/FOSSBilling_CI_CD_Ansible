@@ -1,7 +1,7 @@
 
     - name: Créer un job Jenkins avec le fichier configjob.xml
       ansible.builtin.shell: |
-        curl -X POST "http://{{ host_ip }}:30080/createItem?name=achref" \
+        curl -X POST "{{ jenkins_url }}/createItem?name=achref" \
         --user "admin:password" \
         --header "Content-Type: application/xml" \
         --data-binary "@{{ deploy_path }}/deploy-ci-cd/jenkins-conf/configjob.xml"
@@ -14,7 +14,7 @@
         var: create_job_response.stdout
 
     - name: Récupérer l'adresse IP du service jenkins-jnlp
-      command: oc get svc jenkins-jnlp -n 3spfe -o jsonpath='{.spec.clusterIP}'
+      command: kubectl  get svc jenkins-jnlp -n jenkins -o jsonpath='{.spec.clusterIP}'
       register: jenkins_jnlp_ip
 
     - name: Vérifier si l'adresse IP est vide
@@ -58,7 +58,7 @@
 
     - name: Appliquer la configuration Jenkins avec Jenkins CLI
       ansible.builtin.shell: |
-        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s http://{{ host_ip }}:30080/ \
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s {{  jenkins_url }}/ \
         -auth admin:password apply-configuration < "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/JenkinsConfigurationasCode_new.yaml"
       args:
         chdir: "{{ playbook_dir }}"

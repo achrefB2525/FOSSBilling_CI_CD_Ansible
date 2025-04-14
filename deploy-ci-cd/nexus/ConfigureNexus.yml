@@ -25,7 +25,7 @@
     - name: Create Groovy script to change admin password
       command: >
         curl -u admin:{{ token }} -X POST --header 'Content-Type: application/json'
-        http://{{ host_ip }}:32323/service/rest/v1/script -d '{
+        http://{{ nexus_url  }}/service/rest/v1/script -d '{
           "name": "change-admin-password",
           "type": "groovy",
           "content": "security.securitySystem.changePassword(\"admin\", \"root\");"
@@ -35,19 +35,19 @@
     - name: Run the Groovy script to change admin password
       command: >
         curl -u admin:{{ token }} -X POST --header 'Content-Type: text/plain'
-        http://{{ host_ip }}:32323/service/rest/v1/script/change-admin-password/run
+        http://{{ nexus_url  }}/service/rest/v1/script/change-admin-password/run
       register: run_change_password_script
 
     - name: Delete the Groovy script for changing admin password
       command: >
         curl -u admin:root -X DELETE
-        http://{{ host_ip }}:32323/service/rest/v1/script/change-admin-password
+        http://{{ nexus_url  }}/service/rest/v1/script/change-admin-password
       register: delete_change_password_script
 
     - name: Create Groovy script to enable anonymous access
       command: >
         curl -u admin:root -X POST --header 'Content-Type: application/json'
-        http://{{ host_ip }}:32323/service/rest/v1/script -d '{
+        http://{{ nexus_url  }}/service/rest/v1/script -d '{
           "name": "anonymous",
           "type": "groovy",
           "content": "security.setAnonymousAccess(true);"
@@ -57,19 +57,19 @@
     - name: Run the Groovy script to enable anonymous access
       command: >
         curl -u admin:root -X POST --header 'Content-Type: text/plain'
-        http://{{ host_ip }}:32323/service/rest/v1/script/anonymous/run
+        http://{{ nexus_url  }}/service/rest/v1/script/anonymous/run
       register: run_enable_anonymous_script
 
     - name: Delete the Groovy script for enabling anonymous access
       command: >
         curl -u admin:root -X DELETE
-        http://{{ host_ip }}:32323/service/rest/v1/script/anonymous
+        http://{{ nexus_url  }}/service/rest/v1/script/anonymous
       register: delete_enable_anonymous_script
 
     - name: Create Groovy script for Maven Repository
       command: >
         curl -u admin:root -X POST --header 'Content-Type: application/json'
-        http://{{ host_ip }}:32323/service/rest/v1/script -d '{
+        http://{{ nexus_url  }}/service/rest/v1/script -d '{
           "name": "createDeploymentRepo",
           "type": "groovy",
           "content": "def repo = repository.createMavenHosted(\"deploymentRepo\"); repo.getConfiguration().getAttributes().get(\"storage\").put(\"writePolicy\", \"ALLOW\"); repository.repositoryManager.update(repo.getConfiguration());"
@@ -79,18 +79,18 @@
     - name: Run the Groovy script to create Maven Repository
       command: >
         curl -u admin:root -X POST --header 'Content-Type: text/plain'
-        http://{{ host_ip }}:32323/service/rest/v1/script/createDeploymentRepo/run
+        http://{{ nexus_url  }}/service/rest/v1/script/createDeploymentRepo/run
       register: run_create_repo_script
 
     - name: Delete the Groovy script for Maven Repository
       command: >
         curl -u admin:root -X DELETE
-        http://{{ host_ip }}:32323/service/rest/v1/script/createDeploymentRepo
+        http://{{ nexus_url  }}/service/rest/v1/script/createDeploymentRepo
       register: delete_create_repo_script
 
     - name: Update anonymous user roles
       command: >
-        curl -v -X PUT http://{{ host_ip }}:32323/service/rest/v1/security/users/anonymous
+        curl -v -X PUT http://{{ nexus_url  }}/service/rest/v1/security/users/anonymous
         -u "admin:root" -H "Content-Type: application/json"
         -d '{
           "userId": "anonymous",

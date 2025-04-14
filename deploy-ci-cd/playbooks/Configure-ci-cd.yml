@@ -3,20 +3,10 @@
   hosts: localhost
   gather_facts: no
   vars_files:
-    - vars/vars.yml 
     - vars/passwordvars.yml 
     - vars/sonarvars.yaml
 
   tasks:
-    - name: Appliquer ClusterRoleBinding
-      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/roleManager/ClusterRoleBinding.yaml
-
-    - name: Appliquer ClusterRoleToUser3spe
-      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/roleManager/ClusterRoleToUser3spe.yaml
-    
-    - name: Appliquer ClusterRoleAdminToUser3spe
-      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/roleManager/ClusterRoleBinding-Admin.yaml
-
     - name: Inclure les tâches de configuration Sonar
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/configSonar.yml"
 

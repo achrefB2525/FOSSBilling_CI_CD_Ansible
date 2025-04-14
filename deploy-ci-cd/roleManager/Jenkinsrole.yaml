@@ -1,0 +1,24 @@
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jenkins-cluster-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "namespaces", "deployments", "replicasets", "secrets"]
+  verbs: ["create", "get", "list", "update", "delete", "watch"]
+
+---
+# ClusterRoleBinding pour lier le ClusterRole au service account Jenkins
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-cluster-role-binding
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: jenkins
+roleRef:
+  kind: ClusterRole
+  name: jenkins-cluster-role
+  apiGroup: rbac.authorization.k8s.io
