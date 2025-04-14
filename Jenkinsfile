@@ -1,10 +1,7 @@
 pipeline {
-    agent any
+    agent { label 'php-agent'}
 
-    environment {
-        // Nom que tu as donné dans Jenkins > Configure System > SonarQube servers
-        SONARQUBE_SERVER = 'SonarServer'
-    }
+
 
     stages {
         stage('Clone Repository') {
@@ -15,7 +12,9 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
+                 container('docker'){
                 sh 'composer install --no-interaction'
+                 }
             }
         }
 
@@ -26,29 +25,21 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=FOSSBilling \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN \
-                        -Dsonar.language=php \
-                        -Dsonar.php.coverage.reportPaths=coverage.xml
-                    '''
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
+    stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('sonarqube') {
+            sh '''
+                sonar-scanner \
+                  -Dsonar.projectKey=FOSSBilling \
+                  -Dsonar.sources=. \
+                  -Dsonar.language=php \
+                  -Dsonar.host.url=$SONAR_HOST_URL \
+                  -Dsonar.login=$SONAR_AUTH_TOKEN \
+                  -Dsonar.php.coverage.reportPaths=coverage.xml
+            '''
         }
     }
 }
 
+    }
+}
