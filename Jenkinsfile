@@ -1,10 +1,5 @@
 pipeline {
-     agent {
-    kubernetes {
-      label 'php-agent'
-      defaultContainer 'php-cli'
-    }
-  }
+    agent { label 'php-agent'}
 
     stages {
         stage('Clone Repository') {
