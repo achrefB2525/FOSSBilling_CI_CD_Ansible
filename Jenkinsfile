@@ -27,12 +27,10 @@ pipeline {
     steps {
         withSonarQubeEnv('sonarqube') {
             sh '''
-                sonar-scanner \
+            sonar-scanner \
                   -Dsonar.projectKey=FOSSBilling \
                   -Dsonar.sources=. \
                   -Dsonar.language=php \
-                  -Dsonar.host.url=$SONAR_HOST_URL \
-                  -Dsonar.login=$SONAR_AUTH_TOKEN \
                   -Dsonar.php.coverage.reportPaths=coverage.xml
             '''
         }
