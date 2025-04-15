@@ -25,10 +25,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     def customPath = '/usr/local/bin:$PATH'
-                    sh """
-                        export PATH=${customPath}
-                        phpunit --configuration phpunit.xml.dist --coverage-text
-                    """
+                    sh ' phpunit --configuration phpunit.xml.dist --coverage-text'
                 }
             }
         }
@@ -37,10 +34,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     def customPath = '/usr/local/bin:$PATH'
-                    sh """
-                        export PATH=${customPath}
-                        phpunit --configuration phpunit-live.xml --coverage-text
-                    """
+                    sh ' phpunit --configuration phpunit-live.xml --coverage-text'
                 }
             }
         }
