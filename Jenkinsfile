@@ -9,9 +9,10 @@ pipeline {
             }
         }
    stage('Check PHPUnit Version') {
+        agent { label 'php-unit' }
         steps {
                 echo 'Checking PHPUnit version...'
-                container('php-cli') {
+                container('php-unit') {
                 sh 'phpunit --version'
                 }
             }    
@@ -20,17 +21,15 @@ pipeline {
             steps {
                 echo 'Installing dependencies using Composer...'
                 container('php-cli') {
-                    sh '''
-                        composer install 
-                        composer require --dev phpunit/phpunit
-                    '''
+                    sh ' composer install '
                 }
             }
         }
  
         stage('Run Unit Tests (phpunit.xml.dist)') {
+             agent { label 'php-unit' }
             steps {
-                container('php-cli') {
+                container('php-unit') {
                     sh ' /usr/local/bin/phpunit --configuration phpunit.xml.dist --coverage-text'
                 }
             }
