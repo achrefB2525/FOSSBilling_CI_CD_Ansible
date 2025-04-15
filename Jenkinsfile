@@ -19,13 +19,7 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 container('php-cli') {
-                    sh '''
-                        if [ -f ./vendor/bin/phpunit ]; then
-                          ./vendor/bin/phpunit --coverage-clover=coverage.xml
-                        else
-                          echo "PHPUnit non installé"
-                        fi
-                    '''
+                    sh 'simple-phpunit --coverage-text'  // Utilisation directe de simple-phpunit
                 }
             }
         }
@@ -35,25 +29,25 @@ pipeline {
                 container('php-cli') {
                     sh '''
                         echo "==> PHPStan"
-                        ./vendor/bin/phpstan analyse src || true
+                        phpstan analyse src || true
 
                         echo "==> Rector"
-                        ./vendor/bin/rector process --dry-run || true
+                        rector process --dry-run || true
 
                         echo "==> Psalm"
-                        ./vendor/bin/psalm || true
+                        psalm || true
 
                         echo "==> PHPCS"
-                        ./vendor/bin/phpcs --standard=PSR12 src || true
+                        phpcs --standard=PSR12 src || true
 
                         echo "==> PHP-CS-Fixer"
-                        ./vendor/bin/php-cs-fixer fix --dry-run --diff || true
+                        php-cs-fixer fix --dry-run --diff || true
 
                         echo "==> PHPMD"
-                        ./vendor/bin/phpmd src text cleancode,codesize,controversial,design,naming,unusedcode || true
+                        phpmd src text cleancode,codesize,controversial,design,naming,unusedcode || true
 
                         echo "==> PHPCPD"
-                        ./vendor/bin/phpcpd src || true
+                        phpcpd src || true
                     '''
                 }
             }
