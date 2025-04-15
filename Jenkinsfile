@@ -14,7 +14,7 @@ pipeline {
                echo 'Installing dependencies using Composer...'
                container('php-cli') {
             sh '''
-                composer install --no-interaction --ignore-platform-req=ext-intl
+                composer install 
                 composer require --dev phpunit/phpunit
             '''
           }
