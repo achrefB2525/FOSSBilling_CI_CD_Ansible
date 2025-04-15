@@ -62,7 +62,7 @@ pipeline {
                 echo 'Starting SonarQube analysis...'
                 withSonarQubeEnv('sonarqube') {
                     sh '''
-                          /opt/sonarqube/bin/sonar \
+                          sonar \
                           -Dsonar.projectKey=FOSSBilling \
                           -Dsonar.sources=. \
                           -Dsonar.language=php \
