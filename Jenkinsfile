@@ -10,13 +10,16 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-            steps {
-                echo 'Installing dependencies using Composer...'
-                container('php-cli') {
-                    sh 'composer install --no-interaction --ignore-platform-req=ext-intl'
-                }
-            }
-        }
+          steps {
+               echo 'Installing dependencies using Composer...'
+               container('php-cli') {
+            sh '''
+                composer install --no-interaction --ignore-platform-req=ext-intl
+                composer require --dev phpunit/phpunit
+            '''
+          }
+       }
+     }
 
         stage('Run Unit Tests') {
             steps {
