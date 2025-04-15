@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'kubeagent'}
+    agent { label 'php-agent'}
 
     stages {
         stage('Clone Repository') {
