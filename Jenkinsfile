@@ -24,7 +24,7 @@ pipeline {
   stage('Run Unit Tests (phpunit.xml.dist)') {
             steps {
                 container('php-cli') {
-                    sh '/var/www/composer/vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-text'
+                    sh 'phpunit --configuration phpunit.xml.dist --coverage-text'
                 }
             }
         }
@@ -32,7 +32,7 @@ pipeline {
         stage('Run Unit Tests (phpunit-live.xml)') {
             steps {
                 container('php-cli') {
-                    sh '/var/www/composer/vendor/bin/phpunit --configuration phpunit-live.xml --coverage-text'
+                    sh 'phpunit --configuration phpunit-live.xml --coverage-text'
                 }
             }
         }
