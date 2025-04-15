@@ -4,12 +4,14 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
+                echo 'Cloning the repository...'
                 git url: 'https://github.com/FOSSBilling/FOSSBilling.git', branch: 'main'
             }
         }
 
         stage('Install Dependencies') {
             steps {
+                echo 'Installing dependencies using Composer...'
                 container('php-cli') {
                     sh 'composer install --no-interaction --ignore-platform-req=ext-intl'
                 }
@@ -18,6 +20,7 @@ pipeline {
 
         stage('Run Unit Tests') {
             steps {
+                echo 'Running unit tests using simple-phpunit...'
                 container('php-cli') {
                     sh 'simple-phpunit --coverage-text'  // Utilisation directe de simple-phpunit
                 }
@@ -26,6 +29,7 @@ pipeline {
 
         stage('Quality Checks') {
             steps {
+                echo 'Running quality checks...'
                 container('php-cli') {
                     sh '''
                         echo "==> PHPStan"
@@ -55,6 +59,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
+                echo 'Starting SonarQube analysis...'
                 withSonarQubeEnv('sonarqube') {
                     sh '''
                         sonar-scanner \
