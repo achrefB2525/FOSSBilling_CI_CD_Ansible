@@ -24,6 +24,7 @@ pipeline {
   stage('Run Unit Tests (phpunit.xml.dist)') {
             steps {
                 container('php-cli') {
+                    export PATH="/usr/local/bin:$PATH"
                     sh 'phpunit --configuration phpunit.xml.dist --coverage-text'
                 }
             }
