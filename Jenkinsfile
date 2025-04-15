@@ -11,7 +11,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                  container('php-cli'){
-                sh 'composer install --no-interaction'
+                sh 'composer install --no-interaction --ignore-platform-req=ext-intl '
                  }
             }
         }
