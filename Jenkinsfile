@@ -24,8 +24,11 @@ pipeline {
   stage('Run Unit Tests (phpunit.xml.dist)') {
             steps {
                 container('php-cli') {
-                    export PATH="/usr/local/bin:$PATH"
-                    sh 'phpunit --configuration phpunit.xml.dist --coverage-text'
+                   def customPath = '/usr/local/bin:$PATH'
+                    sh """
+                        export PATH=${customPath}
+                        phpunit --configuration phpunit.xml.dist --coverage-text
+                    """
                 }
             }
         }
@@ -33,7 +36,11 @@ pipeline {
         stage('Run Unit Tests (phpunit-live.xml)') {
             steps {
                 container('php-cli') {
-                    sh 'phpunit --configuration phpunit-live.xml --coverage-text'
+            def customPath = '/usr/local/bin:$PATH'
+                    sh """
+                        export PATH=${customPath}
+                        phpunit --configuration phpunit-live.xml --coverage-text
+                    """
                 }
             }
         }
