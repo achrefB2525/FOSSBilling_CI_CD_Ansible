@@ -21,15 +21,21 @@ pipeline {
        }
      }
 
-        stage('Run Unit Tests') {
+  stage('Run Unit Tests (phpunit.xml.dist)') {
             steps {
-                echo 'Running unit tests using simple-phpunit...'
                 container('php-cli') {
-                    sh 'simple-phpunit --coverage-text'  // Utilisation directe de simple-phpunit
+                    sh './vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-text'
                 }
             }
         }
 
+        stage('Run Unit Tests (phpunit-live.xml)') {
+            steps {
+                container('php-cli') {
+                    sh './vendor/bin/phpunit --configuration phpunit-live.xml --coverage-text'
+                }
+            }
+        }
         stage('Quality Checks') {
             steps {
                 echo 'Running quality checks...'
