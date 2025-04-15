@@ -20,7 +20,14 @@ pipeline {
                 }
             }
         }
-
+    stage('Check PHPUnit Version') {
+        steps {
+                echo 'Checking PHPUnit version...'
+                container('php-cli') {
+                sh 'phpunit --version'
+                }
+            }    
+        }
         stage('Run Unit Tests (phpunit.xml.dist)') {
             steps {
                 container('php-cli') {
