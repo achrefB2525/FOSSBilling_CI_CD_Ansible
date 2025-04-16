@@ -8,14 +8,7 @@ pipeline {
                 git url: 'https://github.com/FOSSBilling/FOSSBilling.git', branch: 'main'
             }
         }
-   stage('Check PHPUnit Version') {
-        steps {
-                echo 'Checking PHPUnit version...'
-                container('php-cli') {
-                sh 'phpunit --version'
-                }
-            }    
-        }
+
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies using Composer...'
