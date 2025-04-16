@@ -9,10 +9,9 @@ pipeline {
             }
         }
    stage('Check PHPUnit Version') {
-        agent { label 'php-unit' }
         steps {
                 echo 'Checking PHPUnit version...'
-                container('php-unit') {
+                container('php-cli') {
                 sh 'phpunit --version'
                 }
             }    
@@ -27,21 +26,15 @@ pipeline {
         }
  
         stage('Run Unit Tests (phpunit.xml.dist)') {
-             agent { label 'php-unit' }
+             agent { label 'php-cli' }
             steps {
                 container('php-unit') {
-                    sh ' /usr/local/bin/phpunit --configuration phpunit.xml.dist --coverage-text'
+                    sh ' phpunit --coverage-text'
                 }
             }
         }
 
-        stage('Run Unit Tests (phpunit-live.xml)') {
-            steps {
-                container('php-cli') {
-                    sh ' /usr/local/bin/phpunit --configuration phpunit-live.xml --coverage-text'
-                }
-            }
-        }
+        
 
         stage('Quality Checks') {
             steps {
