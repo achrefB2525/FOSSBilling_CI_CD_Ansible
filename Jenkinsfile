@@ -20,7 +20,7 @@ pipeline {
  
         stage('Run Unit Tests ') {
             steps {
-                container('php-unit') {
+                container('php-cli') {
                     sh ' phpunit --coverage-text'
                 }
             }
