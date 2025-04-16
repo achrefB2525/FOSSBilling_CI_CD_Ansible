@@ -25,8 +25,7 @@ pipeline {
             }
         }
  
-        stage('Run Unit Tests (phpunit.xml.dist)') {
-             agent { label 'php-cli' }
+        stage('Run Unit Tests ') {
             steps {
                 container('php-unit') {
                     sh ' phpunit --coverage-text'
