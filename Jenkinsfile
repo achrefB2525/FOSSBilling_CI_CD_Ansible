@@ -13,26 +13,26 @@ pipeline {
             steps {
                 echo 'Installing dependencies using Composer...'
                 container('php-cli') {
-                    sh ' composer install '
+                    sh 'composer install'
                 }
             }
         }
- stage('Prepare Config') {
-    steps {
-        sh 'cp src/config-sample.php src/config.php'
-    }
-}
 
- 
-        stage('Run Unit Tests ') {
+        stage('Prepare Config') {
             steps {
-                container('php-cli') {
-                    sh ' phpunit --coverage-text'
-                }
+                echo 'Copying sample config to config.php...'
+                sh 'cp src/config-sample.php src/config.php'
             }
         }
 
-        
+        stage('Run Unit Tests') {
+            steps {
+                echo 'Running PHPUnit tests...'
+                container('php-cli') {
+                    sh 'phpunit --coverage-text'
+                }
+            }
+        }
 
         stage('Quality Checks') {
             steps {
@@ -64,17 +64,21 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Analyse SonarQube') {
+            agent {
+                label 'sonar-agent'
+            }
             steps {
-                echo 'Starting SonarQube analysis...'
                 withSonarQubeEnv('sonarqube') {
-                    sh '''
-                          sonar \
-                          -Dsonar.projectKey=FOSSBilling \
-                          -Dsonar.sources=. \
-                          -Dsonar.language=php \
-                          -Dsonar.php.coverage.reportPaths=coverage.xml
-                    '''
+                    container('sonar-cli') {
+                        sh '''
+                            sonar-scanner \
+                                -Dsonar.projectKey=my-php-project \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=$SONAR_HOST_URL \
+                                -Dsonar.login=$SONAR_AUTH_TOKEN
+                        '''
+                    }
                 }
             }
         }
