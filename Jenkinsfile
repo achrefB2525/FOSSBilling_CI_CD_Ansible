@@ -40,7 +40,7 @@ pipeline {
                 container('php-cli') {
                     sh '''
                         echo "==> PHPStan"
-                        phpstan analyse --format=xml > phpstan-report.xml || true
+                        phpstan analyse  --error-format=xml > phpstan-report.xml || true
 
                         echo "==> Rector"
                         rector process --dry-run || true
@@ -49,7 +49,7 @@ pipeline {
                         psalm --output-format=xml > psalm-report.xml || true
 
                         echo "==> PHPCS"
-                        phpcs --standard=PSR12 --report=xml > phpcs-report.xml || true
+                        phpcs --standard=PSR12 --report-file=phpcs-report.xml || true
 
                         echo "==> PHP-CS-Fixer"
                         php-cs-fixer fix --dry-run --diff || true
