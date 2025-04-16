@@ -17,14 +17,9 @@ pipeline {
                 }
             }
         }
-        stage('Patch Config Path') {
+ stage('Prepare Config') {
     steps {
-        script {
-            sh '''
-                # Modifier la ligne dans bootstrap.php pour pointer vers Config.php
-                sed -i "s|include __DIR__ . '/../src/config.php';|include __DIR__ . '/../src/library/FOSSBilling/Config.php';|" tests-legacy/bootstrap.php
-            '''
-        }
+        sh 'cp src/config-sample.php src/config.php'
     }
 }
 
