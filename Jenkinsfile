@@ -40,7 +40,7 @@ pipeline {
                 container('php-cli') {
                     sh '''
                         echo "==> PHPStan"
-                        phpstan analyse  --error-format=xml > phpstan-report.xml || true
+                        phpstan analyse --error-format=xml > phpstan-report.xml || true
 
                         echo "==> Rector"
                         rector process --dry-run || true
@@ -65,9 +65,7 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                label 'sonar-agent'
-            }
+            agent { label 'sonar-agent' }
             steps {
                 withSonarQubeEnv('sonarqube') {
                     container('sonar-cli') {
@@ -87,12 +85,15 @@ pipeline {
                     }
                 }
             }
-        }stage('Deploy to Nexus') {
+        }
+
+        stage('Deploy to Nexus') {
             steps {
                 echo 'Deploying artifacts to Nexus...'
                 container('php-cli') {
                     sh '''
                         composer config -g repo.packagist composer http://192.168.100.175:32323/repository/composer
+                        
                         composer deploy
                     '''
                 }
