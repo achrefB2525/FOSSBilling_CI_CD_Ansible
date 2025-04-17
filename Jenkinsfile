@@ -1,10 +1,6 @@
 pipeline {
     agent { label 'php-agent' }
 
-    environment {
-        // URL Nexus disponible globalement sans mot de passe
-        NEXUS_URL = credentials('nexus-url') // ou mets une string directe si besoin
-    }
 
     stages {
         stage('Clone Repository') {
@@ -100,7 +96,9 @@ pipeline {
             steps {
                 echo 'Deploying artifacts to Nexus...'
                 container('php-cli') {
-                    withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                 withCredentials([
+    usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS'),
+    string(credentialsId: 'nexus-url', variable: 'NEXUS_URL')]) {
                         sh '''
                             composer config -g repo.packagist composer ${NEXUS_URL}/repository/composer
 
