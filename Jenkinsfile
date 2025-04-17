@@ -90,7 +90,7 @@ pipeline {
 
         stage('Deploy to Nexus') {
             environment {
-                PACKAGE_NAME = fossbilling-paquet'
+                PACKAGE_NAME = 'fossbilling-paquet'
                 PACKAGE_VERSION = '1.0.0'
             }
             steps {
