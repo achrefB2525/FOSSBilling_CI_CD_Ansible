@@ -87,6 +87,16 @@ pipeline {
                     }
                 }
             }
+        }stage('Deploy to Nexus') {
+            steps {
+                echo 'Deploying artifacts to Nexus...'
+                container('php-cli') {
+                    sh '''
+                        composer config -g repo.packagist composer http://192.168.100.175:32323/repository/composer
+                        composer deploy
+                    '''
+                }
+            }
         }
     }
 }
