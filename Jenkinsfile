@@ -1,54 +1,92 @@
 pipeline {
-    agent any
-
-    environment {
-        // Nom que tu as donné dans Jenkins > Configure System > SonarQube servers
-        SONARQUBE_SERVER = 'SonarServer'
-    }
+    agent { label 'php-agent' }
 
     stages {
         stage('Clone Repository') {
             steps {
+                echo 'Cloning the repository...'
                 git url: 'https://github.com/FOSSBilling/FOSSBilling.git', branch: 'main'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh 'composer install --no-interaction'
+                echo 'Installing dependencies using Composer...'
+                container('php-cli') {
+                    sh 'composer install'
+                }
             }
         }
 
-        stage('Run Tests') {
+        stage('Prepare Config') {
             steps {
-                // Si FOSSBilling a des tests PHPUnit
-                sh './vendor/bin/phpunit || true'
+                echo 'Copying sample config to config.php...'
+                sh 'cp src/config-sample.php src/config.php'
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Run Unit Tests') {
             steps {
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
+                echo 'Running PHPUnit tests...'
+                container('php-cli') {
+                    sh 'phpunit --coverage-clover=coverage.xml'
+                }
+            }
+        }
+
+        stage('Quality Checks') {
+            steps {
+                echo 'Running quality checks...'
+                container('php-cli') {
                     sh '''
-                        sonar-scanner \
-                        -Dsonar.projectKey=FOSSBilling \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN \
-                        -Dsonar.language=php \
-                        -Dsonar.php.coverage.reportPaths=coverage.xml
+                        echo "==> PHPStan"
+                        phpstan analyse  --error-format=xml > phpstan-report.xml || true
+
+                        echo "==> Rector"
+                        rector process --dry-run || true
+
+                        echo "==> Psalm"
+                        psalm --output-format=xml > psalm-report.xml || true
+
+                        echo "==> PHPCS"
+                        phpcs --standard=PSR12 --report-file=phpcs-report.xml || true
+
+                        echo "==> PHP-CS-Fixer"
+                        php-cs-fixer fix --dry-run --diff || true
+
+                        echo "==> PHPMD"
+                        phpmd src text cleancode,codesize,controversial,design,naming,unusedcode || true
+
+                        echo "==> PHPCPD"
+                        phpcpd src || true
                     '''
                 }
             }
         }
 
-        stage('Quality Gate') {
+        stage('SonarQube Analysis') {
+            agent {
+                label 'sonar-agent'
+            }
             steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                withSonarQubeEnv('sonarqube') {
+                    container('sonar-cli') {
+                        script {
+                            sh '''
+                                sonar-scanner \
+                                    -Dsonar.projectKey=my-php-project \
+                                    -Dsonar.sources=. \
+                                    -Dsonar.host.url=$SONAR_HOST_URL \
+                                    -Dsonar.login=$SONAR_AUTH_TOKEN \
+                                    -Dsonar.phpstan.reportPath=phpstan-report.xml \
+                                    -Dsonar.phpcs.reportPath=phpcs-report.xml \
+                                    -Dsonar.php.coverage.reportPaths=coverage.xml \
+                                    -Dsonar.psalm.reportPath=psalm-report.xml
+                            '''
+                        }
+                    }
                 }
             }
         }
     }
 }
-
