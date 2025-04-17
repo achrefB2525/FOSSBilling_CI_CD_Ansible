@@ -5,7 +5,7 @@ credentials:
           - string:
               id: "sonar"
               scope: GLOBAL
-              secret: "eac6efee14d86a3fae2276257e61b7b383b7ca4f"
+              secret: "350604edd868e3e9f58f60667b037af13e7e34d8"
           - string:
               id: "dockerhub"
               scope: GLOBAL
@@ -38,98 +38,289 @@ jenkins:
       addMasterProxyEnvVars: true
       containerCap: 10
       containerCapStr: "10"
-      jenkinsTunnel: '10.106.185.167:50000'
+      jenkinsTunnel: '10.105.47.200:50000'
       jenkinsUrl: "http://192.168.100.175:30080/"
       name: "minikube"
       namespace: "jenkins"
-      serverCertificate: |-
+      serverCertificate: |
         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
-        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
+        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
-        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
+        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
-        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
+        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
       serverUrl: "192.168.100.175:8443"
       skipTlsVerify: true
       templates:
-        # Template maven modifié
-        - containers:
-            - image: "jenkins-agent-maven:latest"
-              name: "jnlp"
-              args: "^${computer.jnlpmac} ^${computer.name}"
-              alwaysPullImage: true
-              workingDir: "/tmp"
-          name: "maven"
-          label: "maven"
-
-        # Template nodejs modifié
-        - containers:
-            - image: "jenkins-agent-nodejs:latest"
-              name: "jnlp"
-              args: "^${computer.jnlpmac} ^${computer.name}"
-              alwaysPullImage: true
-              workingDir: "/tmp"
-          name: "nodejs"
-          label: "nodejs"
-
-        # Template jnlp simplifié (nodeSelector supprimé)
-        - id: "70e71f28-61f0-4168-8f76-c1cdbb44087a"
-          label: "kubeagent"
+      - containers:
+        - alwaysPullImage: true
+          args: "^${computer.jnlpmac} ^${computer.name}"
+          image: "jenkins-agent-maven:latest"
           name: "jnlp"
-          namespace: "jenkins"
-          yaml: |-
-            apiVersion: v1
-            kind: Pod
-            metadata:
-              name: agent
-              namespace: jenkins
-            spec:
-              containers:
-                - name: jnlp
-                  image: jenkins-agent-maven
-                  command: ["/bin/bash", "-c"]
-                  args:
-                    - |
-                      JENKINS_URL="^${JENKINS_URL}"
-                      JENKINS_AGENT_NAME="^${JENKINS_AGENT_NAME}"
-                      JENKINS_SECRET="^${JENKINS_SECRET}"
-                      curl -sO "^${JENKINS_URL}/jnlpJars/agent.jar"
-                      java -jar agent.jar -jnlpUrl "^${JENKINS_URL}/computer/^${JENKINS_AGENT_NAME}/jenkins-agent.jnlp" -secret "^${JENKINS_SECRET}" -noCertificateCheck
-                  tty: true
-                - name: docker
-                  image: docker:19.03
-                  command: ["sh", "-c", "sleep 9999999"]
-                  securityContext:
-                    privileged: true
-                  volumeMounts:
-                    - mountPath: /var/run/docker.sock
-                      name: docker-socket
-              volumes:
-                - name: docker-socket
-                  hostPath:
-                    path: /var/run/docker.sock
+          workingDir: "/tmp"
+        id: "55b0c54d-922a-4fee-bc8c-9aa678b4f4a8"
+        label: "maven"
+        name: "maven"
+      - containers:
+        - alwaysPullImage: true
+          args: "^${computer.jnlpmac} ^${computer.name}"
+          image: "jenkins-agent-nodejs:latest"
+          name: "jnlp"
+          workingDir: "/tmp"
+        id: "f2f0c210-5404-459a-9333-3b19d66b9b5f"
+        label: "nodejs"
+        name: "nodejs"
+      - id: "70e71f28-61f0-4168-8f76-c1cdbb44087a"
+        label: "kubeagent"
+        name: "jnlp"
+        namespace: "jenkins"
+        yaml: |-
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: agent
+            namespace: jenkins
+          spec:
+            containers:
+              - name: jnlp
+                image: jenkins-agent-maven
+                command: ["/bin/bash", "-c"]
+                args:
+                  - |
+                    JENKINS_URL="^${JENKINS_URL}"
+                    JENKINS_AGENT_NAME="^${JENKINS_AGENT_NAME}"
+                    JENKINS_SECRET="^${JENKINS_SECRET}"
+                    curl -sO "^${JENKINS_URL}/jnlpJars/agent.jar"
+                    java -jar agent.jar -jnlpUrl "^${JENKINS_URL}/computer/^${JENKINS_AGENT_NAME}/jenkins-agent.jnlp" -secret "^${JENKINS_SECRET}" -noCertificateCheck
+                tty: true
+              - name: docker
+                image: docker:19.03
+                command: ["sh", "-c", "sleep 9999999"]
+                securityContext:
+                  privileged: true
+                volumeMounts:
+                  - mountPath: /var/run/docker.sock
+                    name: docker-socket
+            volumes:
+              - name: docker-socket
+                hostPath:
+                  path: /var/run/docker.sock
+        yamls:
+        - |-
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: agent
+            namespace: jenkins
+          spec:
+            containers:
+              - name: jnlp
+                image: jenkins-agent-maven
+                command: ["/bin/bash", "-c"]
+                args:
+                  - |
+                    JENKINS_URL="^${JENKINS_URL}"
+                    JENKINS_AGENT_NAME="^${JENKINS_AGENT_NAME}"
+                    JENKINS_SECRET="^${JENKINS_SECRET}"
+                    curl -sO "^${JENKINS_URL}/jnlpJars/agent.jar"
+                    java -jar agent.jar -jnlpUrl "^${JENKINS_URL}/computer/^${JENKINS_AGENT_NAME}/jenkins-agent.jnlp" -secret "^${JENKINS_SECRET}" -noCertificateCheck
+                tty: true
+              - name: docker
+                image: docker:19.03
+                command: ["sh", "-c", "sleep 9999999"]
+                securityContext:
+                  privileged: true
+                volumeMounts:
+                  - mountPath: /var/run/docker.sock
+                    name: docker-socket
+            volumes:
+              - name: docker-socket
+                hostPath:
+                  path: /var/run/docker.sock
+      - id: "01c404f2-c3bc-46e7-a148-e001268b158d"
+        label: "php-agent"
+        name: "php"
+        namespace: "jenkins"
+        yaml: |
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: agent-php
+            namespace: jenkins
+            labels:
+              jenkins: php-agent
+          spec:
+            containers:
+              - name: jnlp
+                image: jenkins/inbound-agent:latest
+                command:
+                  - /bin/bash
+                  - -c
+                args:
+                  - |
+                    JENKINS_URL="^${JENKINS_URL}"
+                    JENKINS_AGENT_NAME="^${JENKINS_AGENT_NAME}"
+                    JENKINS_SECRET="^${JENKINS_SECRET}"
+                    curl -sO "^${JENKINS_URL}/jnlpJars/agent.jar"
+                    java -jar agent.jar -jnlpUrl "^${JENKINS_URL}/computer/^${JENKINS_AGENT_NAME}/jenkins-agent.jnlp" -secret "^${JENKINS_SECRET}" -noCertificateCheck
+                tty: true
+                volumeMounts:
+                  - name: workspace-volume
+                    mountPath: /var/www/composer
+
+              - name: php-cli
+                image: achrefdoce/php-cli-intl:PHPUnit-11.5
+                command:
+                  - cat
+                tty: true
+                volumeMounts:
+                  - name: workspace-volume
+                    mountPath: /var/www/composer
+
+            volumes:
+              - name: workspace-volume
+                emptyDir: {}
+
+            restartPolicy: Never
+        yamlMergeStrategy: "override"
+        yamls:
+        - |
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: agent-php
+            namespace: jenkins
+            labels:
+              jenkins: php-agent
+          spec:
+            containers:
+              - name: jnlp
+                image: jenkins/inbound-agent:latest
+                command:
+                  - /bin/bash
+                  - -c
+                args:
+                  - |
+                    JENKINS_URL="^${JENKINS_URL}"
+                    JENKINS_AGENT_NAME="^${JENKINS_AGENT_NAME}"
+                    JENKINS_SECRET="^${JENKINS_SECRET}"
+                    curl -sO "^${JENKINS_URL}/jnlpJars/agent.jar"
+                    java -jar agent.jar -jnlpUrl "^${JENKINS_URL}/computer/^${JENKINS_AGENT_NAME}/jenkins-agent.jnlp" -secret "^${JENKINS_SECRET}" -noCertificateCheck
+                tty: true
+                volumeMounts:
+                  - name: workspace-volume
+                    mountPath: /var/www/composer
+
+              - name: php-cli
+                image: achrefdoce/php-cli-intl:PHPUnit-11.5
+                command:
+                  - cat
+                tty: true
+                volumeMounts:
+                  - name: workspace-volume
+                    mountPath: /var/www/composer
+
+            volumes:
+              - name: workspace-volume
+                emptyDir: {}
+
+            restartPolicy: Never
+      - id: "dc61776e-7a2b-4375-a9a3-3a23dc43f191"
+        label: "sonar-agent"
+        name: "sonarCli"
+        namespace: "jenkins"
+        yaml: |-
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: agent-sonar
+            namespace: jenkins
+            labels:
+              jenkins: sonar-agent
+          spec:
+            containers:
+              - name: jnlp
+                image: jenkins/inbound-agent:latest
+                command:
+                  - /bin/bash
+                  - -c
+                args:
+                  - |
+                    JENKINS_URL="^${JENKINS_URL}"
+                    JENKINS_AGENT_NAME="^${JENKINS_AGENT_NAME}"
+                    JENKINS_SECRET="^${JENKINS_SECRET}"
+                    curl -sO "^${JENKINS_URL}/jnlpJars/agent.jar"
+                    java -jar agent.jar -jnlpUrl "^${JENKINS_URL}/computer/^${JENKINS_AGENT_NAME}/jenkins-agent.jnlp" -secret "^${JENKINS_SECRET}" -noCertificateCheck
+                tty: true
+                volumeMounts:
+                  - name: workspace-volume
+                    mountPath: /var/www/composer
+
+              - name: sonar-cli
+                image: sonarsource/sonar-scanner-cli
+                command: ["cat"]
+                tty: true
+        yamlMergeStrategy: "override"
+        yamls:
+        - |-
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: agent-sonar
+            namespace: jenkins
+            labels:
+              jenkins: sonar-agent
+          spec:
+            containers:
+              - name: jnlp
+                image: jenkins/inbound-agent:latest
+                command:
+                  - /bin/bash
+                  - -c
+                args:
+                  - |
+                    JENKINS_URL="^${JENKINS_URL}"
+                    JENKINS_AGENT_NAME="^${JENKINS_AGENT_NAME}"
+                    JENKINS_SECRET="^${JENKINS_SECRET}"
+                    curl -sO "^${JENKINS_URL}/jnlpJars/agent.jar"
+                    java -jar agent.jar -jnlpUrl "^${JENKINS_URL}/computer/^${JENKINS_AGENT_NAME}/jenkins-agent.jnlp" -secret "^${JENKINS_SECRET}" -noCertificateCheck
+                tty: true
+                volumeMounts:
+                  - name: workspace-volume
+                    mountPath: /var/www/composer
+
+              - name: sonar-cli
+                image: sonarsource/sonar-scanner-cli
+                command: ["cat"]
+                tty: true
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
   disableRememberMe: false
   disabledAdministrativeMonitors:
+  - "org.jenkinsci.plugins.matrixauth.AmbiguityMonitor"
   - "jenkins.model.BuiltInNodeMigration"
   - "hudson.util.DoubleLaunchChecker"
+  - "jenkins.diagnostics.ControllerExecutorsAgents"
   labelAtoms:
-  - name: "java-builder"
+  - name: "built-in"
   - name: "kubeagent"
   - name: "master"
   - name: "maven"
   - name: "nodejs"
-  - name: "nodejs-builder"
+  - name: "php-agent"
+  - name: "sonar-agent"
   labelString: "master"
   markupFormatter: "plainText"
   mode: NORMAL
@@ -229,6 +420,7 @@ unclassified:
     maxAttachmentSize: -1
     maxAttachmentSizeMb: -1
     precedenceBulk: false
+    throttlingEnabled: false
     watchingEnabled: false
   fingerprints:
     fingerprintCleanupDisabled: false
@@ -296,4 +488,3 @@ tool:
   mavenGlobalConfig:
     globalSettingsProvider: "standard"
     settingsProvider: "standard"
-

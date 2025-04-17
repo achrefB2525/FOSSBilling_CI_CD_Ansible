@@ -71,7 +71,7 @@ spec:
               mountPath: /nexus-data
       containers:
         - name: nexus3
-          image: sonatype/nexus3:latest
+          image:  jbuncle/nexus-repository-composer
           ports:
             - containerPort: 8081
           volumeMounts:

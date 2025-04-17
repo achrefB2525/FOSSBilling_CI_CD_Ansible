@@ -79,7 +79,7 @@
       args:
         executable: /bin/bash
 
-    - name: Installer le plugin  Jenkins Configuration as Code (JCasC) 
+    - name: Installer le plugin favorite-view
       shell: >
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
         -s {{ jenkins_url }}
@@ -88,14 +88,6 @@
       args:
         executable: /bin/bash
 
-    - name: Installer le  favorite
-      shell: >
-        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
-        -s {{ jenkins_url }}
-        -auth admin:{{ jenkins_password }}
-        install-plugin favorite-view
-      args:
-        executable: /bin/bash
 
 
     - name: Installer le plugin  Jenkins Configuration as Code (JCasC) 
@@ -134,7 +126,7 @@
       args:
         executable: /bin/bash
 
-   - name: Installer le plugin  bitbucket
+    - name: Installer le plugin  bitbucket
       shell: >
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
         -s {{ jenkins_url }}
@@ -158,21 +150,18 @@
         -s {{ jenkins_url }}
         -auth admin:{{ jenkins_password }}
         install-plugin prometheus
-      args:
-        executable: /bin/bash
+      args: 
+       executable: /bin/bash
 
 
-
-
-    - name: Installer le plugin  Email Extension	
+    - name: Installer le plugin  Pipeline Stage View	
       shell: >
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
         -s {{ jenkins_url }}
         -auth admin:{{ jenkins_password }}
-        install-plugin  email-ext
+        install-plugin  pipeline-stage-view
       args:
         executable: /bin/bash
-
 
     - name: Ajouter un délai de 60 secondes
       pause:

@@ -8,6 +8,11 @@
     - name: Déployer Jenkins depuis jenkinsdeploy.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
 
+   
+    - name: ADD Role to  Jenkins 
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/roleManager/Jenkinsrole.yaml
+
+
     - name: Inclure les tâches de déploiement de PostgreSQL
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/postgres.yaml
 

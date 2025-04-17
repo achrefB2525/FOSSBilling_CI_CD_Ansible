@@ -1,17 +1,15 @@
 
-    - name: Créer un job Jenkins avec le fichier configjob.xml
+    - name: Appliquer la configuration Jenkins avec Jenkins CLI
       ansible.builtin.shell: |
-        curl -X POST "{{ jenkins_url }}/createItem?name=achref" \
-        --user "admin:password" \
-        --header "Content-Type: application/xml" \
-        --data-binary "@{{ deploy_path }}/deploy-ci-cd/jenkins-conf/configjob.xml"
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s {{ jenkins_url }} \
+        -auth admin:password create-job {{ job_name }} < "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/{{ config_file }}"
       args:
         chdir: "{{ playbook_dir }}"
-      register: create_job_response
+      register: config_response
 
-    - name: Afficher la réponse de création du job
-      debug:
-        var: create_job_response.stdout
+    - name: Afficher la réponse de la commande
+      ansible.builtin.debug:
+        var: config_response
 
     - name: Récupérer l'adresse IP du service jenkins-jnlp
       command: kubectl  get svc jenkins-jnlp -n jenkins -o jsonpath='{.spec.clusterIP}'

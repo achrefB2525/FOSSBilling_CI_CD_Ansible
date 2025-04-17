@@ -29,19 +29,19 @@
       <configVersion>2</configVersion>
       <userRemoteConfigs>
         <hudson.plugins.git.UserRemoteConfig>
-          <url>https://github.com/JihedMelki7/Groupe3_Achat.git</url> <!-- Public GitHub repository -->
+          <url>https://github.com/achrefB2525/FOSSBilling_CI_CD_Ansible</url> <!-- Public GitHub repository -->
         </hudson.plugins.git.UserRemoteConfig>
       </userRemoteConfigs>
       <branches>
         <hudson.plugins.git.BranchSpec>
-          <name>facture-achref</name> <!-- Use the specified branch -->
+          <name>main</name> <!-- Use the specified branch -->
         </hudson.plugins.git.BranchSpec>
       </branches>
       <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
       <submoduleCfg class="list"/>
       <extensions/>
     </scm>
-    <scriptPath>jenkinsfile1</scriptPath> <!-- The path to your Jenkinsfile in the repository -->
+    <scriptPath>Jenkinsfile</scriptPath> <!-- The path to your Jenkinsfile in the repository -->
     <lightweight>true</lightweight>
   </definition>
   <triggers/>
