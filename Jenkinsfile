@@ -90,9 +90,8 @@ pipeline {
 
       
                 stage('Build Docker Image') {
-            agent { label 'kubeagent' }
             steps {
-                container('docker') {
+                container('php-cli') {
 
                     
                     script {
@@ -105,9 +104,8 @@ pipeline {
         }
         
         stage('Scan Image with Trivy') {
-              agent { label 'kubeagent' }
             steps {
-                container('docker') {
+                container('php-cli') {
                 script {
                     // Scan de l'image Docker avec Trivy pour détecter les vulnérabilités
                     sh 'trivy image achrefdoce/fossbilling:v1 '
@@ -115,9 +113,8 @@ pipeline {
             }
             }}
                 stage('Push to Docker Hub') {
-                     agent { label 'kubeagent' }
             steps {
-                container('docker') {
+                container('php-cli') {
                     script {
                         def dockerHubImageName = "achrefdoce/fossbilling:v1"
                         withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
