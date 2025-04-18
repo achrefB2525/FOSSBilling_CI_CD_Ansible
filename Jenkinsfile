@@ -105,9 +105,9 @@ pipeline {
         }
         
         stage('Scan Image with Trivy') {
-              agent { label 'security' }
+              agent { label 'kubeagent' }
             steps {
-                container('trivy') {
+                container('docker') {
                 script {
                     // Scan de l'image Docker avec Trivy pour détecter les vulnérabilités
                     sh 'trivy image achrefdoce/fossbilling:v1 '
