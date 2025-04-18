@@ -120,7 +120,7 @@ pipeline {
 
                     
                     script {
-                        sh "docker build -t achrefdoce/Fossbilling:latest  ."
+                        sh "docker build -t achrefdoce/Fossbilling:v1  ."
                     }
                 }
             }
