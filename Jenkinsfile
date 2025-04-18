@@ -103,7 +103,17 @@ pipeline {
                 }
             }
         }
-
+        
+        stage('Scan Image with Trivy') {
+              agent { label 'security' }
+            steps {
+                container('trivy') {
+                script {
+                    // Scan de l'image Docker avec Trivy pour détecter les vulnérabilités
+                    sh 'trivy image achrefdoce/fossbilling:v1 '
+                }
+            }
+            }
                 stage('Push to Docker Hub') {
                      agent { label 'kubeagent' }
             steps {
@@ -112,7 +122,6 @@ pipeline {
                         def dockerHubImageName = "achrefdoce/fossbilling:v1"
                         withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
                             sh "docker login -u achrefdoce -p ${dockerhub}"
-                            sh "docker tag achat:latest ${dockerHubImageName}"
                             sh "docker push ${dockerHubImageName}"
                         }
                     }
