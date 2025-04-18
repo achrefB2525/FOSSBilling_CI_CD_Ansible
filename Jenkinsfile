@@ -113,7 +113,7 @@ pipeline {
                     sh 'trivy image achrefdoce/fossbilling:v1 '
                 }
             }
-            }
+            }}
                 stage('Push to Docker Hub') {
                      agent { label 'kubeagent' }
             steps {
