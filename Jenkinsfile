@@ -111,5 +111,20 @@ pipeline {
                 }
             }
         }
+                stage('Build Docker Image') {
+            agent { label 'kubeagent' }
+            steps {
+                container('docker') {
+                    echo 'Affichage du contenu du Dockerfile :'
+                    sh 'cat Dockerfile'
+
+                    
+                    script {
+                        sh "docker build -t achrefdoce/Fossbilling:latest  ."
+                    }
+                }
+            }
+        }
+
     }
 }
