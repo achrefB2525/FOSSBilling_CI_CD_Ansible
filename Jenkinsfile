@@ -93,12 +93,28 @@ pipeline {
             agent { label 'kubeagent' }
             steps {
                 container('docker') {
-                    echo 'Affichage du contenu du Dockerfile :'
-                    sh 'cat Dockerfile'
 
                     
                     script {
-                        sh "docker build -t achrefdoce/Fossbilling:v1  ."
+                        sh '''
+                        docker build -t achrefdoce/fossbilling:v1  .
+                        '''
+                    }
+                }
+            }
+        }
+
+                stage('Push to Docker Hub') {
+                     agent { label 'kubeagent' }
+            steps {
+                container('docker') {
+                    script {
+                        def dockerHubImageName = "achrefdoce/fossbilling:v1"
+                        withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+                            sh "docker login -u achrefdoce -p ${dockerhub}"
+                            sh "docker tag achat:latest ${dockerHubImageName}"
+                            sh "docker push ${dockerHubImageName}"
+                        }
                     }
                 }
             }
