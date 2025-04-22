@@ -124,8 +124,8 @@ pipeline {
         stage('Déploiement avec kubectl') {
             steps {
                 script {
-                    sh 'kubectl apply -f output.yaml'
-                }
+          kubernetesDeploy(configs: "output.yaml", kubeconfigId: "kubernetes")
+        }
             }
         }
     }
