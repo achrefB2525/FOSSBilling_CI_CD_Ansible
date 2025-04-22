@@ -1,0 +1,4 @@
+name: deployment
+description: A Helm chart for FOSSBilling
+version: 0.1.0
+apiVersion: v2

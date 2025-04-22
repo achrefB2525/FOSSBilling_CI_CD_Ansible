@@ -10,8 +10,8 @@
     - name: Inclure les tâches de configuration Sonar
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/configSonar.yml"
 
-    - name: Inclure les tâches de configuration Nexus
-      include_tasks: "{{ deploy_path }}/deploy-ci-cd/nexus/ConfigureNexus.yml"
+#    - name: Inclure les tâches de configuration Nexus
+#      include_tasks: "{{ deploy_path }}/deploy-ci-cd/nexus/ConfigureNexus.yml"
 
     - name: Inclure les tâches de configuration Jenkins
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/ConfigureJenkins.yml"

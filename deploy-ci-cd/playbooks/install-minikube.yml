@@ -95,3 +95,29 @@
       command: minikube start --driver=none --kubernetes-version=v1.32.0
       become: false  # Exécute la commande en tant qu'utilisateur non-root (achref)
 
+    - name: Télécharger Helm
+      get_url:
+        url: https://get.helm.sh/helm-v3.14.4-linux-amd64.tar.gz
+        dest: /tmp/helm.tar.gz
+
+    - name: Extraire Helm
+      unarchive:
+        src: /tmp/helm.tar.gz
+        dest: /tmp
+        remote_src: yes
+
+    - name: Déplacer le binaire Helm
+      copy:
+        src: /tmp/linux-amd64/helm
+        dest: /usr/local/bin/helm
+        remote_src: yes
+        mode: '0755'
+
+    - name: Vérifier la version de Helm (debug)
+      command: helm version
+      register: helm_version
+      changed_when: false
+
+    - name: Afficher la version de Helm
+      debug:
+        msg: "{{ helm_version.stdout }}"

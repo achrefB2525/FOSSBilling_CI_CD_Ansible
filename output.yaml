@@ -1,0 +1,126 @@
+---
+# Source: deployment/templates/service-app.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: fossbilling-app
+spec:
+  type: ClusterIP
+  selector:
+    app: fossbilling-app
+  ports:
+    - port: 80
+      targetPort: 80
+---
+# Source: deployment/templates/service-db.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: fossbilling-db
+spec:
+  type: ClusterIP 
+  selector:
+    app: fossbilling-db
+  ports:
+    - port: 3306     
+      targetPort: 3306
+---
+# Source: deployment/templates/deployment-app.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-deployment-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fossbilling-app
+  template:
+    metadata:
+      labels:
+        app: fossbilling-app
+    spec:
+      containers:
+        - name: app
+          image: "fossbilling/fossbilling:latest"
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_HOST
+              value: "fossbilling-db.default.svc.cluster.local"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "fossbilling"
+            - name: DB_USER
+              value: "fossbillinguser"
+            - name: DB_PASSWORD
+              value: "password"
+---
+# Source: deployment/templates/deployment-db.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-deployment-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fossbilling-db
+  template:
+    metadata:
+      labels:
+        app: fossbilling-db
+    spec:
+      containers:
+        - name: db
+          image: "mariadb:10.5"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "rootpassword"
+            - name: MYSQL_DATABASE
+              value: "fossbilling"
+            - name: MYSQL_USER
+              value: "fossbillinguser"
+            - name: MYSQL_PASSWORD
+              value: "password"
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: db-storage
+          emptyDir: {}
+---
+# Source: deployment/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fossbilling-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: "selfsigned-issuer"
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - fossbilling.local
+      secretName: fossbilling-tls
+  rules:
+    - host: fossbilling.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fossbilling-app
+                port:
+                  number: 80
+---
+# Source: deployment/templates/clusterissuer.yaml
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}

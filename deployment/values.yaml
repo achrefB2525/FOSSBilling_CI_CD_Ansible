@@ -1,0 +1,55 @@
+replicaCount: 1
+
+image:
+  app:
+    repository: fossbilling/fossbilling
+    tag: latest
+  db:
+    repository: mariadb
+    tag: "10.5"
+
+env:
+  db:
+    MYSQL_ROOT_PASSWORD: rootpassword
+    MYSQL_DATABASE: fossbilling
+    MYSQL_USER: fossbillinguser
+    MYSQL_PASSWORD: password
+  app:
+    DB_HOST: fossbilling-db.default.svc.cluster.local
+    DB_PORT: 3306
+    DB_NAME: fossbilling
+    DB_USER: fossbillinguser
+    DB_PASSWORD: password
+
+clusterIssuer:
+  enabled: true
+  name: selfsigned-issuer
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "selfsigned-issuer"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: fossbilling.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: fossbilling-tls
+      hosts:
+        - fossbilling.local
+
+service:
+  ingress-nginx:
+    type: LoadBalancer  # Expose ingress controller with external IP
+  app:
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  db:
+    type: ClusterIP
+    port: 3306
+    targetPort: 3306
+

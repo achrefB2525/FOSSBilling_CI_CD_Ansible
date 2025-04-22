@@ -4,7 +4,47 @@
   vars_files:
      - vars/passwordvars.yml 
   tasks:
-   
+
+    - name: Activer l'addon Ingress de Minikube
+      shell: minikube addons enable ingress
+      register: result_ingress_enable
+      failed_when: "'Error' in result_ingress_enable.stderr"
+      changed_when: "'enabled' in result_ingress_enable.stdout"
+
+    - name: Appliquer les CRDs pour Cert-Manager
+      shell: kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.10.0/cert-manager.crds.yaml
+      register: result_apply_crds
+      failed_when: "'Error' in result_apply_crds.stderr"
+      changed_when: "'created' in result_apply_crds.stdout"
+
+    - name: Ajouter le repository Helm de Jetstack
+      shell: helm repo add jetstack https://charts.jetstack.io
+      register: result_add_repo
+      failed_when: "'Error' in result_add_repo.stderr"
+      changed_when: "'added' in result_add_repo.stdout"
+
+    - name: Mettre à jour le repository Helm
+      shell: helm repo update
+      register: result_repo_update
+      failed_when: "'Error' in result_repo_update.stderr"
+      changed_when: "'updated' in result_repo_update.stdout"
+
+    - name: Installer Cert-Manager avec Helm
+      shell: helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.10.0
+      register: result_helm_install
+      failed_when: "'Error' in result_helm_install.stderr"
+      changed_when: "'installed' in result_helm_install.stdout"
+
+    - name: Vérifier l'état de Cert-Manager
+      shell: kubectl get pods --namespace cert-manager
+      register: result_cert_manager_status
+      failed_when: "'Error' in result_cert_manager_status.stderr"
+      changed_when: "'cert-manager' in result_cert_manager_status.stdout"
+
+    - name: Afficher l'état des pods Cert-Manager
+      debug:
+        msg: "{{ result_cert_manager_status.stdout }}"   
+
     - name: Déployer Jenkins depuis jenkinsdeploy.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
 
@@ -20,11 +60,8 @@
     - name: Déployer SonarQube depuis sonar.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar.yaml
      
-    - name: Déployer Nexus depuis deplo_nexus.yaml
-      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/nexus/deplo_nexus.yaml
-
-    - name: Inclure les tâches pour installer Trivy
-      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/security/DeployTrivy.yaml
+#    - name: Déployer Nexus depuis deplo_nexus.yaml
+#      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/nexus/deplo_nexus.yaml
  
     - name: Ajouter un délai de 60 secondes
       pause:

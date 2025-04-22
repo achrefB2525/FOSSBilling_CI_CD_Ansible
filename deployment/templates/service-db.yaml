@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fossbilling-db
+spec:
+  type: {{ .Values.service.db.type }} 
+  selector:
+    app: fossbilling-db
+  ports:
+    - port: {{ .Values.service.db.port }}     
+      targetPort: {{ .Values.service.db.targetPort }}  
+

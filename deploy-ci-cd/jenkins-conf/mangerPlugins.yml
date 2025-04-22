@@ -70,6 +70,16 @@
       args:
         executable: /bin/bash
 
+    - name: Installer le plugin Kubernetes Cli
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin  kubernetes-cli
+      args:
+        executable: /bin/bash
+
+
     - name: Installer le plugin   Matrix Authorization Strategy Plugin 
       shell: >
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
@@ -153,6 +163,16 @@
       args: 
        executable: /bin/bash
 
+    - name: Installer le  plugin Email
+      shell: >
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
+        -s {{ jenkins_url }}
+        -auth admin:{{ jenkins_password }}
+        install-plugin email-ext
+      args: 
+       executable: /bin/bash
+
+ 
 
     - name: Installer le plugin  Pipeline Stage View	
       shell: >
@@ -161,11 +181,7 @@
         -auth admin:{{ jenkins_password }}
         install-plugin  pipeline-stage-view
       args:
-        executable: /bin/bash
-
-    - name: Ajouter un délai de 60 secondes
-      pause:
-        seconds: 60
+        executable: /bin/bash 
 
 
     - name: Redémarrer Jenkins pour activer les plugins (si besoin)

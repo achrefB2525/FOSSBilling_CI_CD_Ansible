@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "deployment.fullname" . }}-app
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: fossbilling-app
+  template:
+    metadata:
+      labels:
+        app: fossbilling-app
+    spec:
+      containers:
+        - name: app
+          image: "{{ .Values.image.app.repository }}:{{ .Values.image.app.tag }}"
+          ports:
+            - containerPort: {{ .Values.service.app.targetPort }}
+          env:
+            - name: DB_HOST
+              value: {{ .Values.env.app.DB_HOST | quote }}
+            - name: DB_PORT
+              value: {{ .Values.env.app.DB_PORT | quote }}
+            - name: DB_NAME
+              value: {{ .Values.env.app.DB_NAME | quote }}
+            - name: DB_USER
+              value: {{ .Values.env.app.DB_USER | quote }}
+            - name: DB_PASSWORD
+              value: {{ .Values.env.app.DB_PASSWORD | quote }}
+

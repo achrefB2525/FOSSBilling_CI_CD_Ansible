@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "deployment.fullname" . }}-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fossbilling-db
+  template:
+    metadata:
+      labels:
+        app: fossbilling-db
+    spec:
+      containers:
+        - name: db
+          image: "{{ .Values.image.db.repository }}:{{ .Values.image.db.tag }}"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: {{ .Values.env.db.MYSQL_ROOT_PASSWORD | quote }}
+            - name: MYSQL_DATABASE
+              value: {{ .Values.env.db.MYSQL_DATABASE | quote }}
+            - name: MYSQL_USER
+              value: {{ .Values.env.db.MYSQL_USER | quote }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.env.db.MYSQL_PASSWORD | quote }}
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: db-storage
+          emptyDir: {}

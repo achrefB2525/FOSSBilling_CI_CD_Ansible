@@ -2,7 +2,7 @@
     - name: Appliquer la configuration Jenkins avec Jenkins CLI
       ansible.builtin.shell: |
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s {{ jenkins_url }} \
-        -auth admin:password create-job {{ job_name }} < "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/{{ config_file }}"
+        -auth admin:password create-job {{ job_name }} < "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/configjob.xml"
       args:
         chdir: "{{ playbook_dir }}"
       register: config_response
@@ -18,7 +18,7 @@
     - name: Vérifier si l'adresse IP est vide
       fail:
         msg: "Aucune adresse IP trouvée pour le service jenkins-jnlp."
-      when: jenkins_jnlp_ip.stdout == ""
+      when: jenkins_jnlp_ip.stdout == "" 
 
     - name: Modifier la valeur jenkinsTunnel dans JenkinsConfigurationasCode.yaml
       ansible.builtin.lineinfile:

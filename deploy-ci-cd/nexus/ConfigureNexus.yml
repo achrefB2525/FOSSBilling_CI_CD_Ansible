@@ -76,17 +76,50 @@
         }'
       register: create_repo_script
 
-    - name: Run the Groovy script to create Maven Repository
-      command: >
-        curl -u admin:root -X POST --header 'Content-Type: text/plain'
-        http://{{ nexus_url  }}/service/rest/v1/script/createDeploymentRepo/run
-      register: run_create_repo_script
+    - name: Create Composer Proxy repository in Nexus
+      uri:
+        url: "http://{{ nexus_url }}/service/rest/v1/repositories/composer/proxy"
+        method: POST
+        user: "admin"
+        password: "root"
+        headers:
+          Content-Type: "application/json"
+        body: |
+          {
+            "name": "composer",
+            "format": "composer",
+            "type": "proxy",
+            "url": "{{ nexus_url }}/repository/composer",
+            "storage": {
+              "blobStoreName": "default",
+              "strictContentTypeValidation": true
+            },
+            "httpClient": {
+              "blocked": false,
+              "autoBlock": false,
+              "connectionTimeout": 10000,
+              "socketTimeout": 60000
+            },
+            "proxy": {
+              "remoteUrl": "https://packagist.org",
+              "contentMaxAge": 1440,
+              "metadataMaxAge": 1440,
+              "retrieveRemoteIndexes": true
+            },
+            "negativeCache": {
+              "enabled": true,
+              "timeToLive": 1440
+            },
+            "online": true
+          }
+        body_format: json
+        status_code: 201
+      register: create_composer_proxy_repo
 
-    - name: Delete the Groovy script for Maven Repository
-      command: >
-        curl -u admin:root -X DELETE
-        http://{{ nexus_url  }}/service/rest/v1/script/createDeploymentRepo
-      register: delete_create_repo_script
+    - name: Show the result of the repository creation
+      debug:
+         var: create_composer_proxy_repo
+
 
     - name: Update anonymous user roles
       command: >
