@@ -66,10 +66,9 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            agent { label 'sonar-agent' }
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    container('sonar-cli') {
+                    container('php-cli') {
                         script {
                             sh '''
                                 sonar-scanner \
