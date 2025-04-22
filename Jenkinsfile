@@ -71,7 +71,7 @@ pipeline {
                     container('php-cli') {
                         script {
                             sh '''
-                                sonar-scanner \
+                                /opt/sonar-scanner/bin/sonar-scanner  \
                                     -Dsonar.projectKey=my-php-project \
                                     -Dsonar.sources=. \
                                     -Dsonar.host.url=$SONAR_HOST_URL \
