@@ -1,7 +1,6 @@
 pipeline {
     agent { label 'php-agent' }
 
-
     stages {
         stage('Clone Repository') {
             steps {
@@ -87,31 +86,27 @@ pipeline {
             }
         }
 
-      
-                stage('Build Docker Image') {
+        stage('Build Docker Image') {
             steps {
                 container('php-cli') {
-
-                    
                     script {
-                        sh '''
-                        docker build -t achrefdoce/fossbilling:v1  .
-                        '''
+                        sh 'docker build -t achrefdoce/fossbilling:v1 .'
                     }
                 }
             }
         }
-        
+
         stage('Scan Image with Trivy') {
             steps {
                 container('php-cli') {
-                script {
-                    // Scan de l'image Docker avec Trivy pour détecter les vulnérabilités
-                    sh 'trivy image achrefdoce/fossbilling:v1 '
+                    script {
+                        sh 'trivy image achrefdoce/fossbilling:v1'
+                    }
                 }
             }
-            }}
-                stage('Push to Docker Hub') {
+        }
+
+        stage('Push to Docker Hub') {
             steps {
                 container('php-cli') {
                     script {
@@ -124,16 +119,13 @@ pipeline {
                 }
             }
         }
-         stages {
+
         stage('Déploiement avec kubectl') {
             steps {
                 script {
-                   
                     sh 'kubectl apply -f output.yaml'
                 }
             }
         }
-    }
-
     }
 }
