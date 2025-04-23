@@ -10,7 +10,6 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-              agent { label 'php-agent' }
             steps {
                 echo 'Installing dependencies using Composer...'
                 container('php-cli') {
