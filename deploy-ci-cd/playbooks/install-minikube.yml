@@ -78,12 +78,9 @@
             mode: '0755'
             state: file
 
+    - name: Installer cri-dockerd
+      include_tasks: tasks/install_cri_dockerd.yml
 
-    - name: Activer et démarrer cri-dockerd
-      systemd:
-        name: cri-docker
-        state: started
-        enabled: true
 
     - name: Télécharger Minikube
       get_url:

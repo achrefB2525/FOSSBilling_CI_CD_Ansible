@@ -5,7 +5,7 @@ credentials:
           - string:
               id: "sonar"
               scope: GLOBAL
-              secret: "eb1166cc3dcc44778872925b07454e704425f3ea"
+              secret: "f2e02c8b0f913eecb63a6f4219f605152e8ce971"
           - string:
               id: "dockerhub"
               scope: GLOBAL
@@ -38,7 +38,7 @@ jenkins:
       addMasterProxyEnvVars: true
       containerCap: 10
       containerCapStr: "10"
-      jenkinsTunnel: '10.111.131.70:50000'
+      jenkinsTunnel: '10.104.35.195:50000'
       jenkinsUrl: "http://192.168.100.175:30080/"
       name: "minikube"
       namespace: "jenkins"

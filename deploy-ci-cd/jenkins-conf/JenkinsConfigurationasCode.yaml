@@ -26,7 +26,7 @@ jenkins:
       addMasterProxyEnvVars: true
       containerCap: 10
       containerCapStr: "10"
-      jenkinsTunnel: '10.111.131.70:50000'
+      jenkinsTunnel: '10.104.35.195:50000'
       jenkinsUrl: "http://192.168.100.175:30080/"
       name: "minikube"
       namespace: "jenkins"

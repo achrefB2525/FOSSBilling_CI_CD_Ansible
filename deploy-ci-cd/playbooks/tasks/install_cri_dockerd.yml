@@ -1,0 +1,56 @@
+    - name: Installer git et golang
+      apt:
+        name: [git, golang]
+        state: present
+   
+    - name: Cloner le dépôt cri-dockerd
+      git:
+        repo: https://github.com/Mirantis/cri-dockerd.git
+        dest: /opt/cri-dockerd
+        version: v0.3.1
+
+    - name: Créer le dossier bin
+      file:
+        path: /opt/cri-dockerd/bin
+        state: directory
+
+    - name: Compiler cri-dockerd
+      shell: |
+        cd /opt/cri-dockerd && go build -o bin/cri-dockerd
+      args:
+        chdir: /opt/cri-dockerd
+        creates: /opt/cri-dockerd/bin/cri-dockerd
+
+    - name: Copier cri-dockerd dans /usr/local/bin
+      copy:
+        src: /opt/cri-dockerd/bin/cri-dockerd
+        dest: /usr/local/bin/cri-dockerd
+        mode: '0755'
+
+    - name: Copier les fichiers systemd
+      shell: cp -a /opt/cri-dockerd/packaging/systemd/* /etc/systemd/system/
+      args:
+        creates: /etc/systemd/system/cri-docker.service
+
+    - name: Modifier le chemin vers le binaire
+      replace:
+        path: /etc/systemd/system/cri-docker.service
+        regexp: '/usr/bin/cri-dockerd'
+        replace: '/usr/local/bin/cri-dockerd'
+
+    - name: Recharger systemd
+      shell: |
+        systemctl daemon-reexec
+        systemctl daemon-reload
+
+    - name: Activer le service cri-dockerd
+      systemd:
+        name: cri-docker.service
+        enabled: yes
+        state: started
+
+    - name: Activer le socket cri-docker
+      systemd:
+        name: cri-docker.socket
+        enabled: yes
+        state: started
