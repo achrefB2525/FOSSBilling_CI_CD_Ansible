@@ -5,7 +5,7 @@ credentials:
           - string:
               id: "sonar"
               scope: GLOBAL
-              secret: "f2e02c8b0f913eecb63a6f4219f605152e8ce971"
+              secret: "4ee3562f8be9cd857579051e4eb5df7c5509c323"
           - string:
               id: "dockerhub"
               scope: GLOBAL
@@ -38,29 +38,29 @@ jenkins:
       addMasterProxyEnvVars: true
       containerCap: 10
       containerCapStr: "10"
-      jenkinsTunnel: '10.104.35.195:50000'
-      jenkinsUrl: "http://192.168.100.175:30080/"
+      jenkinsTunnel: '10.107.117.220:50000'
+      jenkinsUrl: "http://192.168.232.128:30080/"
       name: "minikube"
       namespace: "jenkins"
       serverCertificate: |
-       MIIDITCCAgmgAwIBAgIBAjANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwptaW5p
-       a3ViZUNBMB4XDTI1MDQyMDE2NTUzOFoXDTI4MDQyMDE2NTUzOFowMTEXMBUGA1UE
-       ChMOc3lzdGVtOm1hc3RlcnMxFjAUBgNVBAMTDW1pbmlrdWJlLXVzZXIwggEiMA0G
-       CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDau6SwJ3/R7qpuhjNd+vrIiJFgCyoZ
-       kxNR108+TELhV9j3a+8LvbGtOgJZAR9EoMlljLPPhxSc78gG0APMTGxwsVQhrTfW
-       N+mxWqtH4F3HABKNS4P2d5cq9K4VTHIiEWy/atBMiy2gEmU3BNYno/K30x1apQwU
-       Dw0GhQ6HEd1kPX0FHMKvu+JtKylmL6bBfDwdmhPjEHrlklTpS+EJinmKPlCuapLG
-       OTzV1urNidUY4mLVUaENOzG6DjTBPGwR2ud+PhmgDx/viPwYPw8Aqjk18UifwPbB
-       5M/NI2XTBm/Mowz2XIxXKm34nP86acgtf+KZkez7T5xiqC8/1M23iHdZAgMBAAGj
-       YDBeMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUH
-       AwIwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBSyAec0UPeNiEeoz6gjhNyv0ZaQ
-       sDANBgkqhkiG9w0BAQsFAAOCAQEAVtyQLy8elPeixiir+a/FIgadplpzhZ4jOnTA
-       424WdIWuZtOZ63fTjDOi1AP0LMBP1JgPpZhbfthvpjDg1qa37B9Xg5qeBXm7nXBF
-       lSP5QzIBZ9o4JljkNvPlSsS5tDBS6Hl0CcbgxiiANybpHke3GCLFe2pV190e4vx2
-       d02LHU4ecKLQlxJHEOd9Q+2PmvPAqvEaGQ37JpiB7WSPLnvTZ2d2M+ENYrxaMtGc
-       wO8l5vRPnq6dZ8z5RgO5fmz6dEV/YFHGmyads9LNEoWA9JEBxydJUs65Dce1EIPA
-       c/LR6kFjVeeUV4iWyNTczgcItNtZadFRuDugQoGASP5wOHcTSg==
-      serverUrl: "192.168.100.175:8443"
+        MIIDITCCAgmgAwIBAgIBAjANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwptaW5p
+        a3ViZUNBMB4XDTI1MDQyMjE2MzcwNVoXDTI4MDQyMjE2MzcwNVowMTEXMBUGA1UE
+        ChMOc3lzdGVtOm1hc3RlcnMxFjAUBgNVBAMTDW1pbmlrdWJlLXVzZXIwggEiMA0G
+        CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDZczuqx3IsTR/DUBhEJ24UmS7ZSHP8
+        QTMEHsOX6NAawxBjbciqJy+k4d7sdskcLJRui7Y2Ra6A4+DTASs8KvMyIgNIMDYA
+        yRyJKINR59FZg+04N5eKFCIweDb2YzAyULhIFo6tNXj0stws3j0A1uXDpILlrUab
+        M8CkYS8tbhN5K30ZWe6w6NK3378pR8G5Rz95IFWDo99VIsE7/sHWaJ5oFTqdA1Tc
+        Thh/6DvhUVD5MQLv+pASbeTRgywJ/qvHG9s3POaknSWBKbo7TLttTyGyAYxAG8XU
+        Tsh6ih7ftHcXBQXX6lpc4rlr/jiSscVq0174NI4/vfAilsBXvSeRxmtVAgMBAAGj
+        YDBeMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUH
+        AwIwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBQOEb0LidxMSinaV2YILcPoGXdl
+        fTANBgkqhkiG9w0BAQsFAAOCAQEAmHMjwVMJU0OePQIkHywAjE28kKCLCcLoLUqB
+        lypYd0sXaHZSSne4WvEXEGhX14gp8wRRxdvqj6kMLcJM/kpOI9RbRfCJHKBW1mdu
+        g6yPl71PfMb+JqvRMHBzsIrXbVX4kn0SZS0GYLEKINgFzcGjnusjBpBH4/JIMVqT
+        V2n4GAMAlgq+LK6lkTjUjOHX02MkvFTm+H82BzJdzVjS4PCi/CtFCakxbbx0DD3V
+        Ps0xAq4LC87AUeONfo9xsPmBZdY40IhRM4Fo6mo5vQCbLi5ifIh7ozfaVIjW4Zoc
+        sx0XeMQIibZc+b1LWpFYUy4s5IM7y2b2xa04srEJYXgfXUOAAw==
+      serverUrl: "192.168.232.128:8443"
       skipTlsVerify: true
       templates:
       - containers:
@@ -374,12 +374,12 @@ unclassified:
   gitHubConfiguration:
     apiRateLimitChecker: ThrottleForNormalize
   gitHubPluginConfig:
-    hookUrl: "http://192.168.100.175:30080/github-webhook/"
+    hookUrl: "http://192.168.232.128:30080/github-webhook/"
   junitTestResultStorage:
     storage: "file"
   location:
     adminAddress: "address not configured yet <nobody@nowhere>"
-    url: "http://192.168.100.175:30080/"
+    url: "http://192.168.232.128:30080/"
   mailer:
     charset: "UTF-8"
     useSsl: false
@@ -420,7 +420,7 @@ unclassified:
     installations:
     - credentialsId: "sonar"
       name: "sonarqube"
-      serverUrl: "http://192.168.100.175:30090/"
+      serverUrl: "http://192.168.232.128:30090/"
       triggers:
         skipScmCause: false
         skipUpstreamCause: false

@@ -65,7 +65,7 @@
  
     - name: Ajouter un délai de 60 secondes
       pause:
-        seconds: 60
+        seconds: 120
 
     - name: Inclure les tâches pour la gestion des plugins Jenkins
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/mangerPlugins.yml"

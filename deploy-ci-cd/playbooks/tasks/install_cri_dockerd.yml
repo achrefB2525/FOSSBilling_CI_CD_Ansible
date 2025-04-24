@@ -1,13 +1,45 @@
-    - name: Installer git et golang
-      apt:
-        name: [git, golang]
-        state: present
-   
+
+    - name: Supprimer toute ancienne installation de Go
+      file:
+        path: /usr/local/go
+        state: absent
+
+    - name: Télécharger Go 1.20.5 depuis le site officiel
+      get_url:
+        url: https://go.dev/dl/go1.20.5.linux-amd64.tar.gz
+        dest: /tmp/go1.20.5.linux-amd64.tar.gz
+        mode: '0644'
+
+    - name: Extraire Go dans /usr/local
+      unarchive:
+        src: /tmp/go1.20.5.linux-amd64.tar.gz
+        dest: /usr/local
+        remote_src: yes
+
+    - name: Ajouter Go au PATH via /etc/profile.d
+      copy:
+        dest: /etc/profile.d/go.sh
+        content: |
+          export PATH=$PATH:/usr/local/go/bin
+        mode: '0755'
+
+    - name: Appliquer le nouveau PATH immédiatement (optionnel)
+      shell: source /etc/profile.d/go.sh
+      args:
+        executable: /bin/bash
+
+    - name: Activer les variables Go pour tous les utilisateurs
+      shell: |
+        source /etc/profile.d/go_env.sh
+        export PATH=$PATH:/usr/local/go/bin
+      args:
+        executable: /bin/bash
+        
     - name: Cloner le dépôt cri-dockerd
       git:
         repo: https://github.com/Mirantis/cri-dockerd.git
         dest: /opt/cri-dockerd
-        version: v0.3.1
+        version: v0.3.4
 
     - name: Créer le dossier bin
       file:
@@ -16,10 +48,11 @@
 
     - name: Compiler cri-dockerd
       shell: |
-        cd /opt/cri-dockerd && go build -o bin/cri-dockerd
+        source /etc/profile.d/go_env.sh && go build -o bin/cri-dockerd
       args:
         chdir: /opt/cri-dockerd
         creates: /opt/cri-dockerd/bin/cri-dockerd
+        executable: /bin/bash
 
     - name: Copier cri-dockerd dans /usr/local/bin
       copy:

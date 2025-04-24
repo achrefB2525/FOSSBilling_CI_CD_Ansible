@@ -45,6 +45,7 @@ data:
   reset-password.groovy: |
     import jenkins.model.*
     import hudson.security.*
+
     def instance = Jenkins.getInstance()
 
     // Activer la sécurité si ce n’est pas déjà le cas
