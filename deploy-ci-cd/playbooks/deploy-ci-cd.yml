@@ -1,8 +1,8 @@
 ---
 - name: Déploiement complet CI/CD avec Jenkins, SonarQube, Nexus, PostgreSQL et installation de Trivy
-  hosts: localhost 
+  hosts: localhost
   vars_files:
-     - vars/passwordvars.yml 
+    - vars/passwordvars.yml
   tasks:
 
     - name: Activer l'addon Ingress de Minikube
@@ -43,29 +43,39 @@
 
     - name: Afficher l'état des pods Cert-Manager
       debug:
-        msg: "{{ result_cert_manager_status.stdout }}"   
+        msg: "{{ result_cert_manager_status.stdout }}"
 
     - name: Déployer Jenkins depuis jenkinsdeploy.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
 
-   
-    - name: ADD Role to  Jenkins 
+    - name: ADD Role to Jenkins
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/roleManager/Jenkinsrole.yaml
 
+    - name: Récupérer l'IP ClusterIP du service Jenkins
+      command: kubectl get svc jenkins -n jenkins -o jsonpath='{.spec.clusterIP}'
+      register: jenkins_ip
+
+    - name: Définir la variable jenkins_url
+      set_fact:
+        jenkins_url: "http://{{ jenkins_ip.stdout }}:8080"
+
+    - name: Debug - Afficher l'URL de Jenkins
+      debug:
+        var: jenkins_url
 
     - name: Inclure les tâches de déploiement de PostgreSQL
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/postgres.yaml
 
-
     - name: Déployer SonarQube depuis sonar.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar.yaml
-     
+
 #    - name: Déployer Nexus depuis deplo_nexus.yaml
 #      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/nexus/deplo_nexus.yaml
- 
+
     - name: Ajouter un délai de 60 secondes
       pause:
         seconds: 120
 
     - name: Inclure les tâches pour la gestion des plugins Jenkins
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/mangerPlugins.yml"
+

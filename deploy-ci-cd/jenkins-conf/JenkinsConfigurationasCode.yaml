@@ -26,28 +26,28 @@ jenkins:
       addMasterProxyEnvVars: true
       containerCap: 10
       containerCapStr: "10"
-      jenkinsTunnel: '10.107.117.220:50000'
-      jenkinsUrl: "http://192.168.232.128:30080/"
+      jenkinsTunnel: '10.106.174.68:50000'
+      jenkinsUrl: "http://10.104.86.95:8080/"
       name: "minikube"
       namespace: "jenkins"
       serverCertificate: |
         MIIDITCCAgmgAwIBAgIBAjANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDEwptaW5p
-        a3ViZUNBMB4XDTI1MDQyMjE2MzcwNVoXDTI4MDQyMjE2MzcwNVowMTEXMBUGA1UE
+        a3ViZUNBMB4XDTI1MDQyMzEwMDAxMVoXDTI4MDQyMzEwMDAxMVowMTEXMBUGA1UE
         ChMOc3lzdGVtOm1hc3RlcnMxFjAUBgNVBAMTDW1pbmlrdWJlLXVzZXIwggEiMA0G
-        CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDZczuqx3IsTR/DUBhEJ24UmS7ZSHP8
-        QTMEHsOX6NAawxBjbciqJy+k4d7sdskcLJRui7Y2Ra6A4+DTASs8KvMyIgNIMDYA
-        yRyJKINR59FZg+04N5eKFCIweDb2YzAyULhIFo6tNXj0stws3j0A1uXDpILlrUab
-        M8CkYS8tbhN5K30ZWe6w6NK3378pR8G5Rz95IFWDo99VIsE7/sHWaJ5oFTqdA1Tc
-        Thh/6DvhUVD5MQLv+pASbeTRgywJ/qvHG9s3POaknSWBKbo7TLttTyGyAYxAG8XU
-        Tsh6ih7ftHcXBQXX6lpc4rlr/jiSscVq0174NI4/vfAilsBXvSeRxmtVAgMBAAGj
+        CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCuTzPivW+l9lF53lmHrQC1gieHkw7I
+        MmWuNIoEZCt4q1gLYz1prDguKMPjrwewkvLGiH1vQJS1fnKP6tQNFBrvI2/LYlFs
+        HZa0C+Q8ZoH8FeHSz2Q09pl01pEosMQUcs5Z2uLCXx5rge4+6T0hVIFarwqiUAuz
+        j9TUO6LLg7GuXeUjQ3nNuktiiq6JXdJjIhvBVF6skxNZFNJ7teiH5edVCdjt6DLI
+        O292blv7Nr8Md15gPXvk/YKByDSyZM78npsraPWWk6v2LqEudovuEmwZUckKjA34
+        ihFa8+C3IH9VlBCDWhgDQWgjhqBvdLOhCtIsGarH27OLnGTzZ9LQT4H7AgMBAAGj
         YDBeMA4GA1UdDwEB/wQEAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUH
-        AwIwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBQOEb0LidxMSinaV2YILcPoGXdl
-        fTANBgkqhkiG9w0BAQsFAAOCAQEAmHMjwVMJU0OePQIkHywAjE28kKCLCcLoLUqB
-        lypYd0sXaHZSSne4WvEXEGhX14gp8wRRxdvqj6kMLcJM/kpOI9RbRfCJHKBW1mdu
-        g6yPl71PfMb+JqvRMHBzsIrXbVX4kn0SZS0GYLEKINgFzcGjnusjBpBH4/JIMVqT
-        V2n4GAMAlgq+LK6lkTjUjOHX02MkvFTm+H82BzJdzVjS4PCi/CtFCakxbbx0DD3V
-        Ps0xAq4LC87AUeONfo9xsPmBZdY40IhRM4Fo6mo5vQCbLi5ifIh7ozfaVIjW4Zoc
-        sx0XeMQIibZc+b1LWpFYUy4s5IM7y2b2xa04srEJYXgfXUOAAw==
+        AwIwDAYDVR0TAQH/BAIwADAfBgNVHSMEGDAWgBRoZw8bkhgGp2qYFOX9YGzrQZJU
+        PTANBgkqhkiG9w0BAQsFAAOCAQEAeOzvrc5MtMOQbTmQSTWMBOruTfU4KNz37k6u
+        qVL2hax+bJE+K8dIMkMM1GMnSaJrkRjXYteCLyZoPQEHM6boZsapUZwQJNe0B+QA
+        zIRLLqCEKUxWboWulM1C64FZ12bjVdw33uMpB5YyqxsP3c1gp+ZeJjq2ii1uVi/K
+        c5D+wKDPE69Q74BXXHO2o7Yi/XMgc/e6xz7uH7v/qN1ie/SwZ/1JLTwwNVpV1/QV
+        4qe2Ef70P2sRtiGxveN1YBq9QhIgjIEG3ZXrLmGWURS4Ht41NMMLpwzmi6fMx6PY
+        75o+eXXjYgYzMHPYH4ZBYB0bU9tBX7H6Kc9XFk+zo/YLMSuRBA==
       serverUrl: "192.168.232.128:8443"
       skipTlsVerify: true
       templates:
@@ -362,12 +362,12 @@ unclassified:
   gitHubConfiguration:
     apiRateLimitChecker: ThrottleForNormalize
   gitHubPluginConfig:
-    hookUrl: "http://192.168.232.128:30080/github-webhook/"
+    hookUrl: "http://10.104.86.95:8080/github-webhook/"
   junitTestResultStorage:
     storage: "file"
   location:
     adminAddress: "address not configured yet <nobody@nowhere>"
-    url: "http://192.168.232.128:30080/"
+    url: "http://10.104.86.95:8080/"
   mailer:
     charset: "UTF-8"
     useSsl: false
@@ -408,7 +408,7 @@ unclassified:
     installations:
     - credentialsId: "sonar"
       name: "sonarqube"
-      serverUrl: "http://192.168.232.128:30090/"
+      serverUrl: "http://10.99.11.36:9000/"
       triggers:
         skipScmCause: false
         skipUpstreamCause: false
