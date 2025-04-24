@@ -1,0 +1,326 @@
+jenkins:
+  authorizationStrategy:
+    globalMatrix:
+      entries:
+      - userOrGroup:
+          name: "admin"
+          permissions:
+          - "Agent/Configure"
+          - "Agent/Delete"
+          - "Job/Build"
+          - "Job/Configure"
+          - "Job/Create"
+          - "Job/Delete"
+          - "Job/Read"
+          - "Job/Workspace"
+          - "Overall/Administer"
+          - "Overall/Read"
+          - "Run/Delete"
+          - "Run/Update"
+          - "SCM/Tag"
+          - "View/Configure"
+          - "View/Create"
+          - "View/Delete"
+  clouds:
+  - kubernetes:
+      addMasterProxyEnvVars: true
+      containerCap: 10
+      containerCapStr: "10"
+      jenkinsTunnel: '{{ .Values.jenkins.tunnel }}'
+      jenkinsUrl: "{{ .Values.jenkins.url }}"
+      name: "minikube"
+      namespace: "jenkins"
+      serverCertificate: |
+        {{ .Values.kubernetes.certificate | indent 8 }}
+      serverUrl: "{{ .Values.kubernetes.url }}"
+      skipTlsVerify: true
+      templates:
+      - containers:
+        - alwaysPullImage: true
+          args: "^${computer.jnlpmac} ^${computer.name}"
+          image: "jenkins-agent-maven:latest"
+          name: "jnlp"
+          workingDir: "/tmp"
+        id: "55b0c54d-922a-4fee-bc8c-9aa678b4f4a8"
+        label: "maven"
+        name: "maven"
+      - containers:
+        - alwaysPullImage: true
+          args: "^${computer.jnlpmac} ^${computer.name}"
+          image: "jenkins-agent-nodejs:latest"
+          name: "jnlp"
+          workingDir: "/tmp"
+        id: "f2f0c210-5404-459a-9333-3b19d66b9b5f"
+        label: "nodejs"
+        name: "nodejs"
+      - id: "dc61776e-7a2b-4375-a9a3-3a23dc43f191"
+        label: "sonar-agent"
+        name: "sonarCli"
+        namespace: "jenkins"
+        yaml: |-
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: agent-sonar
+            namespace: jenkins
+            labels:
+              jenkins: sonar-agent
+          spec:
+            containers:
+              - name: jnlp
+                image: jenkins/inbound-agent:latest
+                command:
+                  - /bin/bash
+                  - -c
+                args:
+                  - |
+                    JENKINS_URL="^${JENKINS_URL}"
+                    JENKINS_AGENT_NAME="^${JENKINS_AGENT_NAME}"
+                    JENKINS_SECRET="^${JENKINS_SECRET}"
+                    curl -sO "^${JENKINS_URL}/jnlpJars/agent.jar"
+                    java -jar agent.jar -jnlpUrl "^${JENKINS_URL}/computer/^${JENKINS_AGENT_NAME}/jenkins-agent.jnlp" -secret "^${JENKINS_SECRET}" -noCertificateCheck
+                tty: true
+                volumeMounts:
+                  - name: workspace-volume
+                    mountPath: /var/www/composer
+
+              - name: sonar-cli
+                image: sonarsource/sonar-scanner-cli
+                command: ["cat"]
+                tty: true
+      - id: "01c404f2-c3bc-46e7-a148-e001268b158d"
+        label: "php-agent"
+        name: "php"
+        namespace: "jenkins"
+        yaml: |
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: agent-php
+            namespace: jenkins
+            labels:
+              jenkins: php-agent
+          spec:
+            containers:
+              - name: jnlp
+                image: jenkins/inbound-agent:latest
+                command:
+                  - /bin/bash
+                  - -c
+                args:
+                  - |
+                    JENKINS_URL="^${JENKINS_URL}"
+                    JENKINS_AGENT_NAME="^${JENKINS_AGENT_NAME}"
+                    JENKINS_SECRET="^${JENKINS_SECRET}"
+                    curl -sO "^${JENKINS_URL}/jnlpJars/agent.jar"
+                    java -jar agent.jar -jnlpUrl "^${JENKINS_URL}/computer/^${JENKINS_AGENT_NAME}/jenkins-agent.jnlp" -secret "^${JENKINS_SECRET}" -noCertificateCheck
+                tty: true
+                volumeMounts:
+                  - name: workspace-volume
+                    mountPath: /var/www/composer
+
+              - name: php-cli
+                image: achrefdoce/php-agent:last
+                command:
+                  - cat
+                tty: true
+                volumeMounts:
+                  - name: workspace-volume
+                    mountPath: /var/www/composer
+                  - name: docker-sock
+                    mountPath: /var/run/docker.sock
+
+            volumes:
+              - name: workspace-volume
+                emptyDir: {}
+              - name: docker-sock
+                hostPath:
+                  path: /var/run/docker.sock
+                  type: Socket
+
+            restartPolicy: Never
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: false
+  disableRememberMe: false
+  disabledAdministrativeMonitors:
+  - "org.jenkinsci.plugins.matrixauth.AmbiguityMonitor"
+  - "jenkins.model.BuiltInNodeMigration"
+  - "hudson.util.DoubleLaunchChecker"
+  - "jenkins.diagnostics.ControllerExecutorsAgents"
+  labelAtoms:
+  - name: "built-in"
+  - name: "kubeagent"
+  - name: "master"
+  - name: "maven"
+  - name: "nodejs"
+  - name: "php-agent"
+  - name: "security"
+  - name: "sonar-agent"
+  labelString: "master"
+  markupFormatter: "plainText"
+  mode: NORMAL
+  myViewsTabBar: "standard"
+  noUsageStatistics: true
+  nodeMonitors:
+  - "architecture"
+  - "clock"
+  - diskSpace:
+      freeSpaceThreshold: "1GiB"
+      freeSpaceWarningThreshold: "2GiB"
+  - "swapSpace"
+  - tmpSpace:
+      freeSpaceThreshold: "1GiB"
+      freeSpaceWarningThreshold: "2GiB"
+  - "responseTime"
+  numExecutors: 5
+  primaryView:
+    all:
+      name: "all"
+  projectNamingStrategy: "standard"
+  quietPeriod: 1
+  remotingSecurity:
+    enabled: true
+  scmCheckoutRetryCount: 0
+  securityRealm:
+    local:
+      allowsSignup: true
+      enableCaptcha: false
+      users:
+      - id: "admin"
+        name: "Jenkins Admin"
+        properties:
+        - "consoleUrlProvider"
+        - "myView"
+        - mailer:
+            emailAddress: "changeme@changeme.com"
+        - "apiToken"
+        - preferredProvider:
+            providerId: "default"
+        - "timezone"
+        - "experimentalFlags"
+  slaveAgentPort: 50000
+  updateCenter:
+    sites:
+    - id: "default"
+      url: "https://updates.jenkins.io/update-center.json"
+  views:
+  - all:
+      name: "all"
+  viewsTabBar: "standard"
+globalCredentialsConfiguration:
+  configuration:
+    providerFilter: "none"
+    typeFilter: "none"
+appearance:
+  prism:
+    theme: PRISM
+security:
+  apiToken:
+    creationOfLegacyTokenEnabled: false
+    tokenGenerationOnCreationEnabled: false
+    usageStatisticsEnabled: true
+  cps:
+    hideSandbox: false
+  gitHooks:
+    allowedOnAgents: false
+    allowedOnController: false
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: "knownHostsFileVerificationStrategy"
+  scriptApproval:
+    forceSandbox: false
+unclassified:
+  bitbucketEndpointConfiguration:
+    endpoints:
+    - bitbucketCloudEndpoint:
+        enableCache: false
+        manageHooks: false
+        repositoriesCacheDuration: 0
+        teamCacheDuration: 0
+  buildDiscarders:
+    configuredBuildDiscarders:
+    - "jobBuildDiscarder"
+  email-ext:
+    adminRequiredForTemplateTesting: false
+    allowUnregisteredEnabled: false
+    charset: "UTF-8"
+    debugMode: false
+    defaultBody: |-
+      $PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
+
+      Check console output at $BUILD_URL to view the results.
+    defaultContentType: "text/plain"
+    defaultSubject: "$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!"
+    defaultTriggerIds:
+    - "hudson.plugins.emailext.plugins.trigger.FailureTrigger"
+    maxAttachmentSize: -1
+    maxAttachmentSizeMb: -1
+    precedenceBulk: false
+    throttlingEnabled: false
+    watchingEnabled: false
+  fingerprints:
+    fingerprintCleanupDisabled: false
+    storage: "file"
+  gitHubConfiguration:
+    apiRateLimitChecker: ThrottleForNormalize
+  gitHubPluginConfig:
+    hookUrl: "{{ .Values.jenkins.url }}github-webhook/"
+  junitTestResultStorage:
+    storage: "file"
+  location:
+    adminAddress: "address not configured yet <nobody@nowhere>"
+    url: "{{ .Values.jenkins.url }}"
+  mailer:
+    charset: "UTF-8"
+    useSsl: false
+    useTls: false
+  mavenModuleSet:
+    localRepository: "default"
+  pollSCM:
+    pollingThreadCount: 10
+  prometheusConfiguration:
+    appendParamLabel: false
+    appendStatusLabel: false
+    collectCodeCoverage: false
+    collectDiskUsage: true
+    collectNodeStatus: true
+    collectingMetricsPeriodInSeconds: 120
+    countAbortedBuilds: true
+    countFailedBuilds: true
+    countNotBuiltBuilds: true
+    countSuccessfulBuilds: true
+    countUnstableBuilds: true
+    defaultNamespace: "default"
+    fetchTestResults: true
+    jobAttributeName: "jenkins_job"
+    path: "prometheus"
+    perBuildMetrics: false
+    processingDisabledBuilds: false
+    useAuthenticatedEndpoint: false
+  scmGit:
+    addGitTagAction: false
+    allowSecondFetch: false
+    createAccountBasedOnEmail: false
+    disableGitToolChooser: false
+    hideCredentials: false
+    showEntireCommitSummaryInChanges: false
+    useExistingAccountWithSameEmail: false
+  sonarGlobalConfiguration:
+    buildWrapperEnabled: false
+    installations:
+    - credentialsId: "sonar"
+      name: "sonarqube"
+      serverUrl: "{{ .Values.sonarqube.url }}"
+      triggers:
+        skipScmCause: false
+        skipUpstreamCause: false
+  subversionSCM:
+    workspaceFormat: 8
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"
+  mavenGlobalConfig:
+    globalSettingsProvider: "standard"
+    settingsProvider: "standard"
