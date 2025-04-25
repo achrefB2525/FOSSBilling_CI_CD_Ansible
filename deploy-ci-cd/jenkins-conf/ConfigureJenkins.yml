@@ -1,8 +1,7 @@
-
     - name: Appliquer la configuration Jenkins avec Jenkins CLI
       ansible.builtin.shell: |
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s {{ jenkins_url }} \
-        -auth admin:password create-job {{ job_name }} < "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/configjob.xml"
+          -auth admin:password create-job {{ job_name }} < "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/configjob.xml"
       args:
         chdir: "{{ playbook_dir }}"
       register: config_response
@@ -12,7 +11,7 @@
         var: config_response
 
     - name: Récupérer l'adresse IP du service jenkins-jnlp
-      command: kubectl  get svc jenkins-jnlp -n jenkins -o jsonpath='{.spec.clusterIP}'
+      command: kubectl get svc jenkins-jnlp -n jenkins -o jsonpath='{.spec.clusterIP}'
       register: jenkins_jnlp_ip
 
     - name: Vérifier si l'adresse IP est vide
@@ -20,12 +19,43 @@
         msg: "Aucune adresse IP trouvée pour le service jenkins-jnlp."
       when: jenkins_jnlp_ip.stdout == "" 
 
-    - name: Modifier la valeur jenkinsTunnel dans JenkinsConfigurationasCode.yaml
-      ansible.builtin.lineinfile:
-        path: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/JenkinsConfigurationasCode.yaml"
-        regexp: '^ *jenkinsTunnel:'
-        line: "      jenkinsTunnel: '{{ jenkins_jnlp_ip.stdout }}:50000'"
-      when: jenkins_jnlp_ip.stdout != ""
+    # Nouvelle tâche pour récupérer l'URL de Kubernetes
+    - name: Récupérer l'URL de l'API Kubernetes
+      command: kubectl config view --minify -o jsonpath={.clusters[0].cluster.server}
+      register: kubernetes_url
+      changed_when: false
+      
+    - name: Afficher l'URL de Kubernetes
+      debug:
+       msg: "L'URL de Kubernetes est : {{ kubernetes_url.stdout }}"
+
+
+    - name: Formater le certificat et récupérer le contenu
+      ansible.builtin.command:
+        cmd: "python3 {{ deploy_path }}/deploy-ci-cd/jenkins-conf/format_cert.py"
+      register: cert_output
+      args:
+        chdir: "{{ playbook_dir }}"
+
+    - name: Lire le contenu du certificat formaté
+      ansible.builtin.slurp:
+        src: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/formatted_client.crt"
+      register: certificate_file
+
+    - name: Définir la variable certificate avec le contenu du certificat
+      set_fact:
+        certificate: "{{ certificate_file.content }}"
+        
+    - name: Générer le fichier values.yaml en utilisant le modèle
+      ansible.builtin.template:
+        src: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-jcasc.yaml.j2"
+        dest: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-jcasc.yaml"
+      vars:
+        jenkins_url: "{{ jenkins_url }}"
+        jenkins_tunnel: "{{ jenkins_jnlp_ip.stdout }}"
+        sonarqube_url: "{{ sonar_url }}"
+        kubernetes_url: "{{ kubernetes_url.stdout }}"
+
 
     - name: Lire le token Sonar depuis le fichier
       ansible.builtin.command: cat {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar_token.txt
@@ -51,13 +81,13 @@
 
     - name: Concaténer le fichier temporaire avec l'ancien fichier
       ansible.builtin.shell: |
-        cat {{ deploy_path }}/deploy-ci-cd/jenkins-conf/tmp_credentials.yaml {{ deploy_path }}/deploy-ci-cd/jenkins-conf/JenkinsConfigurationasCode.yaml > {{ deploy_path }}/deploy-ci-cd/jenkins-conf/JenkinsConfigurationasCode_new.yaml
+        cat {{ deploy_path }}/deploy-ci-cd/jenkins-conf/tmp_credentials.yaml {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-jcasc.yaml > {{ deploy_path }}/deploy-ci-cd/jenkins-conf/JenkinsConfigurationasCode_new.yaml
       register: concat_response
 
     - name: Appliquer la configuration Jenkins avec Jenkins CLI
       ansible.builtin.shell: |
-        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s {{  jenkins_url }}/ \
-        -auth admin:password apply-configuration < "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/JenkinsConfigurationasCode_new.yaml"
+        java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar -s {{ jenkins_url }} \
+          -auth admin:password apply-configuration < "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/JenkinsConfigurationasCode_new.yaml"
       args:
         chdir: "{{ playbook_dir }}"
       register: config_response
@@ -65,6 +95,3 @@
     - name: Afficher la réponse de la configuration Jenkins
       debug:
         var: config_response.stdout
-
- 
-

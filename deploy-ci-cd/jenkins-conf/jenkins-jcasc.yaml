@@ -26,13 +26,13 @@ jenkins:
       addMasterProxyEnvVars: true
       containerCap: 10
       containerCapStr: "10"
-      jenkinsTunnel: '{{ .Values.jenkins.tunnel }}'
-      jenkinsUrl: "{{ .Values.jenkins.url }}"
+      jenkinsTunnel: '10.107.25.47:50000'
+      jenkinsUrl: "http://10.99.242.84:8080"
       name: "minikube"
       namespace: "jenkins"
       serverCertificate: |
-        {{ .Values.kubernetes.certificate | indent 8 }}
-      serverUrl: "{{ .Values.kubernetes.url }}"
+       ICAgICAgICBNSUlESVRDQ0FnbWdBd0lCQWdJQkFqQU5CZ2txaGtpRzl3MEJBUXNGQURBVk1STXdFUVlEVlFRREV3cHRhVzVwCiAgICAgICAgYTNWaVpVTkJNQjRYRFRJMU1EUXlOREUyTXpjMU1sb1hEVEk0TURReU5ERTJNemMxTWxvd01URVhNQlVHQTFVRQogICAgICAgIENoTU9jM2x6ZEdWdE9tMWhjM1JsY25NeEZqQVVCZ05WQkFNVERXMXBibWxyZFdKbExYVnpaWEl3Z2dFaU1BMEcKICAgICAgICBDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRHhiRUVEZlc5ZjM4ZUE1czhIY1RhRmk1YTl4bDFWCiAgICAgICAgcmJZT0wwa1hiMXNPeGpOWU9ETmRCNHBXdjVFcTRPS1VuaThiS2hhb2tKTnpDM2pHZ3kwc3NXYnNCY0RNUG0rSAogICAgICAgIElBcDN3eEE1RHZrUFgvcFZxbitZMWVYTkF2QWpnbDh6VCtFbHpmU2U0emR5U1d0WERST3dpZDhFY1BlbURHdkcKICAgICAgICB3NXk2UFQ3bzNVU2FhRytWQk9nbHo2MDBVNFVmTUN0R1czRXU1V1YvbVRSRFllczdlMFZtUG9jZWplMjBPc0l3CiAgICAgICAgMkMzUktkQzlVWVVFOXhVZzFHQW5jNDZkTytycEIyUXpGd0tvdFpUN1doU0YrSEc4b3dWbmd2cFZDbHFKajk0cAogICAgICAgIFJLQUVaWHlXeXVxS2ZRQ1U3b3pYY1IycTFFTGpMOUNXR3VHZ1Z6S0xPc3BRSVY1VUpjL0p2cnpMQWdNQkFBR2oKICAgICAgICBZREJlTUE0R0ExVWREd0VCL3dRRUF3SUZvREFkQmdOVkhTVUVGakFVQmdnckJnRUZCUWNEQVFZSUt3WUJCUVVICiAgICAgICAgQXdJd0RBWURWUjBUQVFIL0JBSXdBREFmQmdOVkhTTUVHREFXZ0JROWhYTzlTaHFKWXpxRHJPK2xqcTJTYWhqVgogICAgICAgIER6QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFoM3BnQjJ2elRyNEUvU0s3a3ZJZFhHUDZaV2lubHAwNWxoR0EKICAgICAgICBuRkV2Q01nMm5GaHlnZVVYYjkyRUYzMXFISWkrdTdoSk15NkJNVk10VHJkMHVudnNPcGo4OWcrVE94eUd2dnBVCiAgICAgICAga1d3ZnpNejhBUS92NjdZM3N5UHpZL2NkN1YrTlpYVnovSSsrMFJLak1VQ3FQb1Q5NTB1ZFA5VzVUdndxV2x5cwogICAgICAgIDVrSTJjV0lpRG5hUjhiUWhrUFcySFc1RkkxVDdsT1Y0ZEZpcmtqNW5rRkFHMVE2T0VTUkk1enM3MWNveXIyczUKICAgICAgICBvdTJkbWpPMGl4Ky9xdGZVcVlaQm0xazlwL1A2Zml5WW5lZHdRWkVIYUxFSlJJQnB6RzczQUxPOHJLS0R5WlE2CiAgICAgICAgQUV6NEFtTzJUcVVSdmxLNGphRjZFK2xUd3J6MktzRmhTUk9ZdElPdStmdGxsMVJ5Rnc9PQo=
+      serverUrl: "{'cmd': ['kubectl', 'config', 'view', '--minify', '-o', 'jsonpath={.clusters[0].cluster.server}'], 'stdout': 'https://10.10.10.131:8443', 'stderr': '', 'rc': 0, 'start': '2025-04-25 18:21:38.039997', 'end': '2025-04-25 18:21:38.075809', 'delta': '0:00:00.035812', 'changed': False, 'stdout_lines': ['https://10.10.10.131:8443'], 'stderr_lines': [], 'failed': False}"
       skipTlsVerify: true
       templates:
       - containers:
@@ -264,12 +264,12 @@ unclassified:
   gitHubConfiguration:
     apiRateLimitChecker: ThrottleForNormalize
   gitHubPluginConfig:
-    hookUrl: "{{ .Values.jenkins.url }}github-webhook/"
+    hookUrl: "http://10.99.242.84:8080github-webhook/"
   junitTestResultStorage:
     storage: "file"
   location:
     adminAddress: "address not configured yet <nobody@nowhere>"
-    url: "{{ .Values.jenkins.url }}"
+    url: "http://10.99.242.84:8080"
   mailer:
     charset: "UTF-8"
     useSsl: false
@@ -310,7 +310,7 @@ unclassified:
     installations:
     - credentialsId: "sonar"
       name: "sonarqube"
-      serverUrl: "{{ .Values.sonarqube.url }}"
+      serverUrl: "http://10.101.76.78:9000"
       triggers:
         skipScmCause: false
         skipUpstreamCause: false
