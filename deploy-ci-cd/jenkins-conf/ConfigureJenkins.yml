@@ -19,7 +19,6 @@
         msg: "Aucune adresse IP trouvée pour le service jenkins-jnlp."
       when: jenkins_jnlp_ip.stdout == "" 
 
-    # Nouvelle tâche pour récupérer l'URL de Kubernetes
     - name: Récupérer l'URL de l'API Kubernetes
       command: kubectl config view --minify -o jsonpath={.clusters[0].cluster.server}
       register: kubernetes_ul
@@ -46,11 +45,15 @@
       set_fact:
         certificate: "{{ certificate_file.content }}"
 
-    - name: Lire le token Sonar depuis le fichier
-      ansible.builtin.command: cat {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar_token.txt
-      register: sonar_token
+    - name: Lire le contenu du Sonar Token
+      ansible.builtin.slurp:
+        src: "{{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar_token.txt"
+      register: sonar_file
 
-        
+    - name: Définir la variable  sonar_token avec le contenu du  sonar_file
+      set_fact:
+        sonar_token: "{{  sonar_file.content }}"
+
     - name: Générer le fichier values.yaml en utilisant le modèle
       ansible.builtin.template:
         src: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-jcasc.yaml.j2"
