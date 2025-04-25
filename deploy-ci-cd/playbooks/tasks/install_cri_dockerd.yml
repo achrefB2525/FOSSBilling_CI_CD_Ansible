@@ -28,12 +28,7 @@
       args:
         executable: /bin/bash
 
-    - name: Activer les variables Go pour tous les utilisateurs
-      shell: |
-        source /etc/profile.d/go_env.sh
-        export PATH=$PATH:/usr/local/go/bin
-      args:
-        executable: /bin/bash
+
         
     - name: Cloner le dépôt cri-dockerd
       git:
@@ -48,7 +43,7 @@
 
     - name: Compiler cri-dockerd
       shell: |
-        source /etc/profile.d/go_env.sh && go build -o bin/cri-dockerd
+            source /etc/profile.d/go.sh && go build -o bin/cri-dockerd
       args:
         chdir: /opt/cri-dockerd
         creates: /opt/cri-dockerd/bin/cri-dockerd

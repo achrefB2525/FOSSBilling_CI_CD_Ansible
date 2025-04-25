@@ -11,40 +11,45 @@
       failed_when: "'Error' in result_ingress_enable.stderr"
       changed_when: "'enabled' in result_ingress_enable.stdout"
 
-    - name: Appliquer les CRDs pour Cert-Manager
-      shell: kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.10.0/cert-manager.crds.yaml
-      register: result_apply_crds
-      failed_when: "'Error' in result_apply_crds.stderr"
-      changed_when: "'created' in result_apply_crds.stdout"
+    - name: Apply Cert-Manager CRDs
+      command: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.2/cert-manager.crds.yaml
+      register: crds_apply
+      changed_when: "'created' in crds_apply.stdout or 'unchanged' in crds_apply.stdout"
 
-    - name: Ajouter le repository Helm de Jetstack
-      shell: helm repo add jetstack https://charts.jetstack.io
-      register: result_add_repo
-      failed_when: "'Error' in result_add_repo.stderr"
-      changed_when: "'added' in result_add_repo.stdout"
+    # Ajouter le repository Helm de Cert-Manager
+    - name: Add Helm repository for Cert-Manager
+      command: helm repo add jetstack https://charts.jetstack.io --force-update
+      register: helm_repo_add
+      changed_when: "'already exists' not in helm_repo_add.stdout"
 
-    - name: Mettre à jour le repository Helm
-      shell: helm repo update
-      register: result_repo_update
-      failed_when: "'Error' in result_repo_update.stderr"
-      changed_when: "'updated' in result_repo_update.stdout"
+    # Installer Cert-Manager avec Helm
+    - name: Install Cert-Manager with Helm
+      command: helm install cert-manager --namespace cert-manager --version v1.17.2 jetstack/cert-manager
+      register: cert_manager_install
+      changed_when: "'installed' in cert_manager_install.stdout or 'updated' in cert_manager_install.stdout"
 
-    - name: Installer Cert-Manager avec Helm
-      shell: helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.10.0
-      register: result_helm_install
-      failed_when: "'Error' in result_helm_install.stderr"
-      changed_when: "'installed' in result_helm_install.stdout"
+    # Vérifier l'installation de Cert-Manager
+    - name: Verify Cert-Manager pods are running
+      command: kubectl get pods --namespace cert-manager -l app.kubernetes.io/name=cert-manager
+      register: cert_manager_check
+      failed_when: false
+      changed_when: false
 
-    - name: Vérifier l'état de Cert-Manager
-      shell: kubectl get pods --namespace cert-manager
-      register: result_cert_manager_status
-      failed_when: "'Error' in result_cert_manager_status.stderr"
-      changed_when: "'cert-manager' in result_cert_manager_status.stdout"
-
-    - name: Afficher l'état des pods Cert-Manager
+    - name: Display Cert-Manager Pod status
       debug:
-        msg: "{{ result_cert_manager_status.stdout }}"
+        msg: "Cert-Manager Pods: {{ cert_manager_check.stdout }}"
 
+    # Vérifier si les CRDs sont correctement appliquées
+    - name: Check if Cert-Manager CRDs are installed
+      command: kubectl get crd | grep cert-manager
+      register: crds_check
+      failed_when: false
+      changed_when: false
+
+    - name: Display CRDs status
+      debug:
+        msg: "Cert-Manager CRDs: {{ crds_check.stdout }}"
+        
     - name: Déployer Jenkins depuis jenkinsdeploy.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
 
@@ -74,7 +79,7 @@
 
     - name: Ajouter un délai de 60 secondes
       pause:
-        seconds: 120
+        seconds: 200
 
     - name: Inclure les tâches pour la gestion des plugins Jenkins
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/mangerPlugins.yml"

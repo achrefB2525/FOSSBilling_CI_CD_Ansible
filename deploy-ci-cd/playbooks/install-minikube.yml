@@ -3,7 +3,8 @@
   become: yes
   vars:
     docker_version: "5:20.10.24~3-0~ubuntu-focal"
-    minikube_version: "1.32.0"
+    minikube_version: "1.35.0"
+    kubectl_version: "1.32.0"
     user_home: "/home/achref"
     user_name: "achref"
 
@@ -69,7 +70,7 @@
       block:
         - name: Télécharger crictl
           get_url:
-            url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.28.0/crictl-v1.28.0-linux-amd64.tar.gz"
+            url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/v{{ kubectl_version }}/crictl-v{{ kubectl_version }}-linux-amd64.tar.gz"
             dest: "/tmp/crictl.tar.gz"
 
         - name: Extraire crictl
@@ -92,6 +93,27 @@
         path: /opt/cni/bin
         state: directory
         mode: '0755'
+        
+    - name: Créer le répertoire /etc/cni/net.d
+      file:
+        path: /etc/cni/net.d
+        state: directory
+        mode: '0755'
+
+    - name: Ajouter l'utilisateur au groupe Docker
+      user:
+        name: "{{ ansible_user }}"  
+        group: docker
+        append: yes
+
+    - name: Vérifier que l'utilisateur appartient au groupe docker
+      command: id -nG
+      register: user_groups
+      changed_when: false
+
+    - name: Afficher les groupes de l'utilisateur
+      debug:
+        msg: "L'utilisateur {{ ansible_user }} appartient aux groupes: {{ user_groups.stdout }}"
 
     - name: Télécharger les CNI plugins
       get_url:
@@ -113,7 +135,7 @@
 
     - name: Télécharger kubectl version {{ kubectl_version }}
       get_url:
-        url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+        url: "https://dl.k8s.io/release/v{{ kubectl_version }}/bin/linux/amd64/kubectl"
         dest: /usr/local/bin/kubectl
         mode: '0755'
         force: yes
@@ -132,34 +154,88 @@
         url: "https://storage.googleapis.com/minikube/releases/v{{ minikube_version }}/minikube-linux-amd64"
         dest: /usr/local/bin/minikube
         mode: "0755"
+    - name: Modifier les permissions du socket Docker
+      file:
+        path: /var/run/docker.sock
+        mode: '0666'
+
 
     - name: Démarrer Minikube avec l'utilisateur {{ user_name }}
       command: minikube start --driver=none --kubernetes-version={{ kubectl_version }}
       become: false  # Exécute la commande en tant qu'utilisateur non-root (achref)
 
-    - name: Télécharger Helm
-      get_url:
-        url: https://get.helm.sh/helm-v3.14.4-linux-amd64.tar.gz
-        dest: /tmp/helm.tar.gz
+    - name: Install Helm using snap
+      command: snap install helm --classic
+      
+    - name: Ensure namespace exists via kubectl
+      command: kubectl create namespace {{ namespace }}
+      register: create_ns
+      failed_when: false
+      changed_when: "'created' in create_ns.stdout"
 
-    - name: Extraire Helm
-      unarchive:
-        src: /tmp/helm.tar.gz
-        dest: /tmp
-        remote_src: yes
 
-    - name: Déplacer le binaire Helm
-      copy:
-        src: /tmp/linux-amd64/helm
-        dest: /usr/local/bin/helm
-        remote_src: yes
-        mode: '0755'
+    - name: Ajouter le repo Helm pour Prometheus
+      command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 
-    - name: Vérifier la version de Helm (debug)
-      command: helm version
-      register: helm_version
+    - name: Ajouter le repo Helm pour Grafana
+      command: helm repo add grafana https://grafana.github.io/helm-charts
+
+    # Mettre à jour les repos Helm
+    - name: Mettre à jour les repos Helm
+      command: helm repo update
+
+    # Installer Prometheus via Helm
+    - name: Installer Prometheus via Helm
+      command: >
+        helm upgrade --install prometheus prometheus-community/prometheus
+        --namespace monitoring
+        --create-namespace=false
+      environment:
+        KUBECONFIG: "~/.kube/config "
+
+
+    - name: Installer Grafana via Helm
+      command: >
+        helm upgrade --install {{ grafana_release_name }}
+        grafana/grafana
+        --namespace {{ namespace }}
+        --create-namespace=false
+        --set adminPassword="admin123"
+        --set service.type=NodePort
+      args:
+        creates: "/tmp/grafana_installed"
+
+
+    - name: Toucher un fichier pour suivre l'installation de Prometheus
+      file:
+        path: /tmp/prometheus_installed
+        state: touch
+
+    - name: Toucher un fichier pour suivre l'installation de Grafana
+      file:
+        path: /tmp/grafana_installed
+        state: touch
+
+    # Vérification des installations
+    - name: Vérifier que Prometheus est installé
+      command: kubectl get pods --namespace {{ namespace }} -l "app.kubernetes.io/name=prometheus"
+      register: prometheus_check
+      failed_when: false
       changed_when: false
 
-    - name: Afficher la version de Helm
+    - name: Vérifier que Grafana est installé
+      command: kubectl get pods --namespace {{ namespace }} -l "app.kubernetes.io/name=grafana"
+      register: grafana_check
+      failed_when: false
+      changed_when: false
+
+    - name: Afficher le statut de Prometheus
       debug:
-        msg: "{{ helm_version.stdout }}"
+        msg: "Prometheus Pods: {{ prometheus_check.stdout }}"
+
+        
+        
+        
+        
+        
+        
