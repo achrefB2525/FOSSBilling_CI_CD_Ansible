@@ -3,7 +3,6 @@
   hosts: localhost
   gather_facts: no
   vars_files:
-    - vars/passwordvars.yml 
     - vars/sonarvars.yaml
 
   tasks:

@@ -22,12 +22,12 @@
     # Nouvelle tâche pour récupérer l'URL de Kubernetes
     - name: Récupérer l'URL de l'API Kubernetes
       command: kubectl config view --minify -o jsonpath={.clusters[0].cluster.server}
-      register: kubernetes_url
+      register: kubernetes_ul
       changed_when: false
       
     - name: Afficher l'URL de Kubernetes
       debug:
-       msg: "L'URL de Kubernetes est : {{ kubernetes_url.stdout }}"
+       msg: "L'URL de Kubernetes est : {{ kubernetes_ul.stdout }}"
 
 
     - name: Formater le certificat et récupérer le contenu
@@ -59,9 +59,9 @@
         jenkins_url: "{{ jenkins_url }}"
         jenkins_tunnel: "{{ jenkins_jnlp_ip.stdout }}"
         sonarqube_url: "{{ sonar_url }}"
-        kubernetes_url: "{{ kubernetes_url.stdout }}"
+        kubernetes_url: "{{host_ip}}:8443"
         sonar_token: "{{ sonar_token }}"
-        repo_password: "{{ repo_password }}"
+        repo_password: ££££££
 
     - name: Appliquer la configuration Jenkins avec Jenkins CLI
       ansible.builtin.shell: |
