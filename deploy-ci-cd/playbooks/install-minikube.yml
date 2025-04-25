@@ -1,5 +1,6 @@
 - name: Installer Docker, Minikube et cri-dockerd
   hosts: localhost
+  become: yes
   vars:
     docker_version: "5:20.10.24~3-0~ubuntu-focal"
     minikube_version: "1.35.0"
@@ -133,6 +134,7 @@
 
 
     - name: Télécharger kubectl version {{ kubectl_version }}
+ 
       get_url:
         url: "https://dl.k8s.io/release/v{{ kubectl_version }}/bin/linux/amd64/kubectl"
         dest: /usr/local/bin/kubectl
@@ -148,11 +150,13 @@
     - name: Afficher la version de kubectl
       debug:
        msg: "{{ kubectl_check.stdout }}"
+       
     - name: Télécharger Minikube
       get_url:
         url: "https://storage.googleapis.com/minikube/releases/v{{ minikube_version }}/minikube-linux-amd64"
         dest: /usr/local/bin/minikube
         mode: "0755"
+        
     - name: Modifier les permissions du socket Docker
       file:
         path: /var/run/docker.sock
@@ -169,21 +173,7 @@
          
 
 
-    - name: Ajouter le repo Helm pour Prometheus
-      command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-      become_user: "{{ ansible_user }}"
-    
-    - name: Update le repo Helm pour Prometheus
-      command: helm repo update
-      become_user: "{{ ansible_user }}"
-   
-    - name: Installer Prometheus via Helm
-      command: helm install prometheus prometheus-community/kube-prometheus-stack
-      become_user: "{{ ansible_user }}"
-      environment:
-        KUBECONFIG: "~/.kube/config "
-
-
+  
         
         
         

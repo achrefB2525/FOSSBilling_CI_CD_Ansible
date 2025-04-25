@@ -1,9 +1,34 @@
 ---
 - name: Déploiement complet CI/CD avec Jenkins, SonarQube, Nexus, PostgreSQL et installation de Trivy
   hosts: localhost
+  become: false
   vars_files:
     - vars/passwordvars.yml
   tasks:
+     - name: Déployer Jenkins depuis jenkinsdeploy.yaml
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
+
+    - name: ADD Role to Jenkins
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/roleManager/Jenkinsrole.yaml
+
+    - name: Récupérer l'IP ClusterIP du service Jenkins
+      command: kubectl get svc jenkins -n jenkins -o jsonpath='{.spec.clusterIP}'
+      register: jenkins_ip
+ 
+    - name: Ajouter le repo Helm pour Prometheus
+      command: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+      become: false
+    
+    - name: Update le repo Helm pour Prometheus
+      command: helm repo update
+      become: false
+   
+    - name: Installer Prometheus via Helm
+      command: helm install prometheus prometheus-community/kube-prometheus-stack
+      become: false
+      environment:
+        KUBECONFIG: "~/.kube/config "
+
 
     - name: Activer l'addon Ingress de Minikube
       shell: minikube addons enable ingress
@@ -13,12 +38,14 @@
 
     - name: Apply Cert-Manager CRDs
       command: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.2/cert-manager.crds.yaml
+      become: false
       register: crds_apply
       changed_when: "'created' in crds_apply.stdout or 'unchanged' in crds_apply.stdout"
 
     # Ajouter le repository Helm de Cert-Manager
     - name: Add Helm repository for Cert-Manager
       command: helm repo add jetstack https://charts.jetstack.io --force-update
+      become: false
       register: helm_repo_add
       changed_when: "'already exists' not in helm_repo_add.stdout"
 
@@ -40,15 +67,6 @@
       debug:
         msg: "Cert-Manager CRDs: {{ crds_check.stdout }}"
         
-    - name: Déployer Jenkins depuis jenkinsdeploy.yaml
-      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
-
-    - name: ADD Role to Jenkins
-      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/roleManager/Jenkinsrole.yaml
-
-    - name: Récupérer l'IP ClusterIP du service Jenkins
-      command: kubectl get svc jenkins -n jenkins -o jsonpath='{.spec.clusterIP}'
-      register: jenkins_ip
 
     - name: Définir la variable jenkins_url
       set_fact:
@@ -76,7 +94,7 @@
 
     - name: Ajouter un délai de 60 secondes
       pause:
-        seconds: 200
+        seconds: 80
 
     - name: Inclure les tâches pour la gestion des plugins Jenkins
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/mangerPlugins.yml"
