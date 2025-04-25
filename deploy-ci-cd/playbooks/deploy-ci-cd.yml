@@ -25,21 +25,11 @@
     # Installer Cert-Manager avec Helm
     - name: Install Cert-Manager with Helm
       command: helm install cert-manager --namespace cert-manager --version v1.17.2 jetstack/cert-manager
+      become: false
       register: cert_manager_install
       changed_when: "'installed' in cert_manager_install.stdout or 'updated' in cert_manager_install.stdout"
 
-    # Vérifier l'installation de Cert-Manager
-    - name: Verify Cert-Manager pods are running
-      command: kubectl get pods --namespace cert-manager -l app.kubernetes.io/name=cert-manager
-      register: cert_manager_check
-      failed_when: false
-      changed_when: false
 
-    - name: Display Cert-Manager Pod status
-      debug:
-        msg: "Cert-Manager Pods: {{ cert_manager_check.stdout }}"
-
-    # Vérifier si les CRDs sont correctement appliquées
     - name: Check if Cert-Manager CRDs are installed
       command: kubectl get crd | grep cert-manager
       register: crds_check
@@ -70,6 +60,13 @@
 
     - name: Inclure les tâches de déploiement de PostgreSQL
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/postgres.yaml
+      
+    - name: Créer le dossier /mnt/data/sonar sans owner
+      ansible.builtin.file:
+      path: /mnt/data/sonar
+      state: directory
+      mode: '0755'
+
 
     - name: Déployer SonarQube depuis sonar.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar.yaml

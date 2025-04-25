@@ -1,3 +1,15 @@
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - string:
+              id: "sonar"
+              scope: GLOBAL
+              secret: "{{ sonar_token }}"
+          - string:
+              id: "dockerhub"
+              scope: GLOBAL
+              secret: "{{ repo_password }}"
 jenkins:
   authorizationStrategy:
     globalMatrix:
