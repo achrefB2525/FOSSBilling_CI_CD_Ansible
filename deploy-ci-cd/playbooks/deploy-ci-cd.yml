@@ -2,10 +2,8 @@
 - name: Déploiement complet CI/CD avec Jenkins, SonarQube, Nexus, PostgreSQL et installation de Trivy
   hosts: localhost
   become: false
-  vars_files:
-    - vars/passwordvars.yml
   tasks:
-     - name: Déployer Jenkins depuis jenkinsdeploy.yaml
+    - name: Déployer Jenkins depuis jenkinsdeploy.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
 
     - name: ADD Role to Jenkins
@@ -25,9 +23,8 @@
    
     - name: Installer Prometheus via Helm
       command: helm install prometheus prometheus-community/kube-prometheus-stack
+      become_user: achref
       become: false
-      environment:
-        KUBECONFIG: "~/.kube/config "
 
 
     - name: Activer l'addon Ingress de Minikube
@@ -48,6 +45,9 @@
       become: false
       register: helm_repo_add
       changed_when: "'already exists' not in helm_repo_add.stdout"
+      
+    - name: Create namespaces Cert-Manager 
+      command: kubectl create namespace cert-manager
 
     # Installer Cert-Manager avec Helm
     - name: Install Cert-Manager with Helm
@@ -80,10 +80,11 @@
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/postgres.yaml
       
     - name: Créer le dossier /mnt/data/sonar sans owner
+      become: true
       ansible.builtin.file:
-      path: /mnt/data/sonar
-      state: directory
-      mode: '0755'
+        path: /mnt/data/sonar
+        state: directory
+        mode: '0755'
 
 
     - name: Déployer SonarQube depuis sonar.yaml
