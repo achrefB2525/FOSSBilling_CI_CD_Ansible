@@ -121,10 +121,13 @@ pipeline {
         }
 
         stage('Déploiement avec kubectl') {
-            steps {
-                      withKubeConfig([credentialsId: 'kubeconfig']) {
-                sh 'kubectl apply -f output.yaml'}
+  steps {
+        container('php-cli') { // <<< exécute dans le conteneur php-cli
+            withKubeConfig([credentialsId: 'kubeconfig']) {
+                sh 'kubectl apply -f output.yaml'
             }
+        }
+    }
         }
     }
 }
