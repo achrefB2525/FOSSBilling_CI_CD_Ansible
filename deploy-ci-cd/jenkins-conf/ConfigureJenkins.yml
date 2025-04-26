@@ -52,7 +52,7 @@
 
     - name: Définir la variable  sonar_token avec le contenu du  sonar_file
       set_fact:
-        sonar_token: "{{  sonar_file.content }}"
+        sonar_token: "{{ sonar_file.content | b64decode }}"
 
     - name: Générer le fichier values.yaml en utilisant le modèle
       ansible.builtin.template:
@@ -63,8 +63,7 @@
         jenkins_tunnel: "{{ jenkins_jnlp_ip.stdout }}"
         sonarqube_url: "{{ sonar_url }}"
         kubernetes_url: "{{host_ip}}:8443"
-        sonar_token: "{{ sonar_token }}"
-        repo_password: ££££££
+
 
     - name: Appliquer la configuration Jenkins avec Jenkins CLI
       ansible.builtin.shell: |
