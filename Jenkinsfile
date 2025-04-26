@@ -122,13 +122,17 @@ pipeline {
 
         stage('Déploiement avec kubectl') {
   steps {
-    script {
-            node('master') { 
-                sh 'kubectl apply -f output.yaml'
-            }
+        container('php-cli') { 
+                sh '''
+                curl -L -o output.yaml https://raw.githubusercontent.com/achrefB2525/FOSSBilling_CI_CD_Ansible/main/output.yaml
+
+                kubectl apply -f output.yaml
+            '''
+
         }
+    }
 
     }
         }
     }
-}
+
