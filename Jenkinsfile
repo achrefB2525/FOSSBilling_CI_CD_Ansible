@@ -40,7 +40,7 @@ pipeline {
                 container('php-cli') {
                     sh '''
                         echo "==> PHPStan"
-                        phpstan analyse --error-format=xml > phpstan-report.xml || true
+                        phpstan analyse --error-format=checkstyle > phpstan-report.xml || true
 
                         echo "==> Rector"
                         rector process --dry-run || true
