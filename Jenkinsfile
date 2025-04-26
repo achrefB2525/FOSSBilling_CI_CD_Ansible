@@ -122,9 +122,10 @@ pipeline {
 
         stage('Déploiement avec kubectl') {
             steps {
-                script {
-          kubernetesDeploy(configs: "output.yaml", kubeconfigId: "kubernetes")
-        }
+                    kubernetesDeploy(
+                    configs: 'output.yaml',
+                    kubeconfigId: 'kubeconfig'
+                )
             }
         }
     }
