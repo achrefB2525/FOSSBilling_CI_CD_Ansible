@@ -122,7 +122,7 @@ pipeline {
 
         stage('Déploiement avec kubectl') {
   steps {
-script {
+    script {
             node('master') { 
                 sh 'kubectl apply -f output.yaml'
             }
