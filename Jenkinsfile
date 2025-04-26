@@ -122,11 +122,12 @@ pipeline {
 
         stage('Déploiement avec kubectl') {
   steps {
-        container('php-cli') {
-
+script {
+            node('master') { 
                 sh 'kubectl apply -f output.yaml'
-
+            }
         }
+
     }
         }
     }
