@@ -75,7 +75,7 @@
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
         -s {{ jenkins_url }}
         -auth admin:{{ jenkins_password }}
-        install-plugin    kubernetes-pipeline-devops-steps
+        install-plugin   kubernetes-cli
       args:
         executable: /bin/bash
 
