@@ -40,7 +40,7 @@ pipeline {
                 container('php-cli') {
                     sh '''
                         echo "==> PHPStan"
-                        phpstan analyse --error-format=xml > phpstan-report.xml || true
+                        phpstan analyse --error-format=checkstyle > phpstan-report.xml || true
 
                         echo "==> Rector"
                         rector process --dry-run || true
@@ -121,11 +121,18 @@ pipeline {
         }
 
         stage('Déploiement avec kubectl') {
-            steps {
-                script {
-          kubernetesDeploy(configs: "output.yaml", kubeconfigId: "kubernetes")
-        }
-            }
+  steps {
+        container('php-cli') { 
+                sh '''
+                curl -L -o output.yaml https://raw.githubusercontent.com/achrefB2525/FOSSBilling_CI_CD_Ansible/main/output.yaml
+
+                kubectl apply -f output.yaml
+            '''
+
         }
     }
-}
+
+    }
+        }
+    }
+

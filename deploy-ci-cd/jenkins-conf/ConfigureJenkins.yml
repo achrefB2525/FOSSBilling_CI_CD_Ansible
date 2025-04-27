@@ -19,7 +19,6 @@
         msg: "Aucune adresse IP trouvée pour le service jenkins-jnlp."
       when: jenkins_jnlp_ip.stdout == "" 
 
-    # Nouvelle tâche pour récupérer l'URL de Kubernetes
     - name: Récupérer l'URL de l'API Kubernetes
       command: kubectl config view --minify -o jsonpath={.clusters[0].cluster.server}
       register: kubernetes_ul
@@ -51,11 +50,18 @@
         src: "{{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar_token.txt"
       register: sonar_file
 
+<<<<<<< HEAD
+=======
+    - name: Lire le contenu du Sonar Token
+      ansible.builtin.slurp:
+        src: "{{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/sonar_token.txt"
+      register: sonar_file
+
+>>>>>>> ee340b94d0b614703553d7fb701c451c52e8e848
     - name: Définir la variable  sonar_token avec le contenu du  sonar_file
       set_fact:
         sonar_token: "{{ sonar_file.content | b64decode }}"
 
-        
     - name: Générer le fichier values.yaml en utilisant le modèle
       ansible.builtin.template:
         src: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-jcasc.yaml.j2"
@@ -65,6 +71,10 @@
         jenkins_tunnel: "{{ jenkins_jnlp_ip.stdout }}"
         sonarqube_url: "{{ sonar_url }}"
         kubernetes_url: "{{host_ip}}:8443"
+<<<<<<< HEAD
+=======
+
+>>>>>>> ee340b94d0b614703553d7fb701c451c52e8e848
 
     - name: Appliquer la configuration Jenkins avec Jenkins CLI
       ansible.builtin.shell: |
