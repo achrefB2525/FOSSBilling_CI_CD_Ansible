@@ -5,8 +5,14 @@ metadata:
   namespace: jenkins
 rules:
   - apiGroups: [""]
-    resources: ["pods", "pods/exec", "pods/log"]
-    verbs: ["get", "list", "watch", "create", "delete"]
+    resources: ["pods", "pods/exec", "pods/log", "services"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -21,3 +27,27 @@ roleRef:
   kind: Role
   name: jenkins-role
   apiGroup: rbac.authorization.k8s.io
+---
+# Pour clusterissuers (obligé de créer un ClusterRole et ClusterRoleBinding)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jenkins-clusterissuer-role
+rules:
+  - apiGroups: ["cert-manager.io"]
+    resources: ["clusterissuers"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-clusterissuer-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: jenkins
+roleRef:
+  kind: ClusterRole
+  name: jenkins-clusterissuer-role
+  apiGroup: rbac.authorization.k8s.io
+

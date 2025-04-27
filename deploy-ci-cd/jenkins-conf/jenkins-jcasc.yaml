@@ -5,11 +5,11 @@ credentials:
           - string:
               id: "sonar"
               scope: GLOBAL
-              secret: "{'cmd': ['cat', '/home/achref/Desktop/FOSSBilling_CI_CD_Ansible/deploy-ci-cd/sonarqubedeploy/sonar_token.txt'], 'stdout': '1ab98289de23c83f98177081e6d28630f0557643', 'stderr': '', 'rc': 0, 'start': '2025-04-25 22:56:16.969322', 'end': '2025-04-25 22:56:16.972613', 'delta': '0:00:00.003291', 'changed': True, 'stdout_lines': ['1ab98289de23c83f98177081e6d28630f0557643'], 'stderr_lines': [], 'failed': False}"
+              secret: "5860f9dd4302400563ef3d706dc83e1a6bf3fd6f"
           - string:
               id: "dockerhub"
               scope: GLOBAL
-              secret: "££££££"
+              secret: "16/10Nikomik??"
 jenkins:
   authorizationStrategy:
     globalMatrix:
@@ -38,13 +38,13 @@ jenkins:
       addMasterProxyEnvVars: true
       containerCap: 10
       containerCapStr: "10"
-      jenkinsTunnel: '10.96.190.95:50000'
-      jenkinsUrl: "http://10.96.45.111:8080"
+      jenkinsTunnel: '10.100.84.46:50000'
+      jenkinsUrl: "http://10.110.221.162:8080"
       name: "minikube"
       namespace: "jenkins"
       serverCertificate: |
-       ICAgICAgICBNSUlESVRDQ0FnbWdBd0lCQWdJQkFqQU5CZ2txaGtpRzl3MEJBUXNGQURBVk1STXdFUVlEVlFRREV3cHRhVzVwCiAgICAgICAgYTNWaVpVTkJNQjRYRFRJMU1EUXlOREl3TURJek5sb1hEVEk0TURReU5ESXdNREl6Tmxvd01URVhNQlVHQTFVRQogICAgICAgIENoTU9jM2x6ZEdWdE9tMWhjM1JsY25NeEZqQVVCZ05WQkFNVERXMXBibWxyZFdKbExYVnpaWEl3Z2dFaU1BMEcKICAgICAgICBDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRGRJN2NER01LVjN3WDRBcFNNVGQ5N29hRldsYlBhCiAgICAgICAgdlJVQzc0SUVGZ3QwanBGNzZRL0UyR3hKcGpITVNIVEFjRW1hemRiK1dzZytTazc4WVJhOVhpQXZZYldJb1VKUAogICAgICAgIGVxcjNBZ3JYOHpVR0hGSnM2OFpnNlp0MThrR3FhaU1zMjFyWFNXQ2JSNTdmN3VpNTVTRjBhR0lEU0tSaUg0NGwKICAgICAgICA5ZjY5anJwNVlNdlg0NVNGVG9RNVNtRTlNblhFaWVMdHoyeUZZajAzM0FxblRDOEhXK0NGQlZiOTBiQ0t3SEhLCiAgICAgICAgVW1ES0lvUy9iWEE4U3ZleE5BODh1Z0dVZ3AwMWF6RHQ1TEtjNEMxdld3OEhiUDVCMjNuRjBmVzdiNFo1a052dQogICAgICAgIFBtVlpYTWhucTc3ZnBtVzVUcnFreWNkSEF5dWd5SE1LSm11eFNiblR2U0c5UlA2S2hJZFcxWC9qQWdNQkFBR2oKICAgICAgICBZREJlTUE0R0ExVWREd0VCL3dRRUF3SUZvREFkQmdOVkhTVUVGakFVQmdnckJnRUZCUWNEQVFZSUt3WUJCUVVICiAgICAgICAgQXdJd0RBWURWUjBUQVFIL0JBSXdBREFmQmdOVkhTTUVHREFXZ0JRanNGZEVJZyt3REpGK0wzQU9VZ1J6S1dJcgogICAgICAgIGh6QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFDcm5QLzUxWnl1dDljVWxYYjRDS3c1OUc4QkFKQTRNN3FIbjAKICAgICAgICB2OTBDTGNad2RmR2tmUkdJYVg0dTVZRWM0NEQ5Z2dWRkR2RWw2Tm8yZXlzRG9vRy85VWR0ZE4zakZNdmlPZlR0CiAgICAgICAgY29MY2Z4UEtJNGVRUFpwaVpBWk1SQW9nemRQSzBVVG5jczNvZ2xSTnhQekxaVkxHSyt4RFozaFUzazdZOEtEbgogICAgICAgIFUvSmpES2hRczBsQnBIRDVoSytJNW56ZURjcUhEWGh2UWJUZXIwZGJIbnJiUWZQYmJaWEozdUsvYjVuZUpmVTAKICAgICAgICBZMW5nbWkwd0hPVDdXSk9tV2NvZVFhbVNDQ2x5bE5CUUZjZFh4ekM1YWZYTzRGZkZjMjdncFFHc2VIUFphQXQrCiAgICAgICAgNDlVWUVMVXBpRWxOV2Q5WXJVRktxcHNFSGE1ellRaU56MmsrZlIySFdia2Z6TjRlNVE9PQo=
-      serverUrl: "10.10.10.131:8443"
+       ICAgICAgICBNSUlESVRDQ0FnbWdBd0lCQWdJQkFqQU5CZ2txaGtpRzl3MEJBUXNGQURBVk1STXdFUVlEVlFRREV3cHRhVzVwCiAgICAgICAgYTNWaVpVTkJNQjRYRFRJMU1EUXlOakE1TURNMU4xb1hEVEk0TURReU5qQTVNRE0xTjFvd01URVhNQlVHQTFVRQogICAgICAgIENoTU9jM2x6ZEdWdE9tMWhjM1JsY25NeEZqQVVCZ05WQkFNVERXMXBibWxyZFdKbExYVnpaWEl3Z2dFaU1BMEcKICAgICAgICBDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRFNFNEpZVHNUVWs4TlA5eUxYZXNxUDZYRXR3WjQzCiAgICAgICAgMDVFZmYvUStxVXN4akkzeUdzcllHd0d5ZmRpS3A1RXZvY01Bd3RwTml0UkFIMkhxaUFQWVVDSUdWSzdNRk1TcgogICAgICAgIGlMc2MraU5IVnh5SlVrang3Q0owaU40eG41L2FJRklNK1pwN0pGZ3lva3JKZ3VTOXhMUE9McENYYTZUcU5ZdHkKICAgICAgICB4QzQrSE1tYitoSmd5QmsvZ1lqVHFiZlNOL1JGTGdVS05ONVlqY0F4UXliTVVwalZFQ3VHTW1vV0ZmZ2pnUkFwCiAgICAgICAgM3FndkRyTWo2T1pwbUtScnhUNzM3RVl2eHV4bFFQclhKYWhpd0NQWUF6c2h2OTlrcittZEJHckJmVjJMZVRzNQogICAgICAgIGlqR09Qd3c2dGFDSXBsZ1dPTVlYUW5udWk3SGw0SnJtQjBvbWlISG50SFpBN2VDZlhFdFlTRHJUQWdNQkFBR2oKICAgICAgICBZREJlTUE0R0ExVWREd0VCL3dRRUF3SUZvREFkQmdOVkhTVUVGakFVQmdnckJnRUZCUWNEQVFZSUt3WUJCUVVICiAgICAgICAgQXdJd0RBWURWUjBUQVFIL0JBSXdBREFmQmdOVkhTTUVHREFXZ0JRWFp3WXU0bU8rOE4yN3UzekorN2d4THZwTQogICAgICAgIEh6QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFkMkx3ZUpMN1hnMnA0S3FyVkpVL1BDNHFiYk5rb1JMSVQrWGoKICAgICAgICBab0FseXZPRGNudmUvOENxS3ZXWllJaDc1SzA0dzd6d2YzSHpkT09ETEcwNFFFSXFmS05pdW8yeVJVc3l0b2tHCiAgICAgICAgSFVrNnRDaVJ1VGlOUGlmV3p1aER5UHhFOGR5OFNSaVp1Nys1Wi83bGdzRTI0UUlvbkxpZjVtclAzb1BzOU0zLwogICAgICAgIHQzb2VUc01EZWlaN2p2c1RjK1BmNEdpaXlzUlBubXJOVXQ2bGRTanhhTG1DSzNkOEkzR3VwNjNBc0JhME1OZkMKICAgICAgICAxcTczWnRML250WHZ0QUlaL0RCenFCaWNvN3JTbkhMTXZPZHg3OTZhYXZobm05S0t2NFRGckkxYytyanNsWklMCiAgICAgICAgRWNhREtSRFJJdnlZQm9IanV1b1J4Yi85N0dEQ0xzTXR4ZFB6dDJnZTIxYmVVSWpxL0E9PQo=
+      serverUrl: "10.10.10.134:8443"
       skipTlsVerify: true
       templates:
       - containers:
@@ -276,12 +276,12 @@ unclassified:
   gitHubConfiguration:
     apiRateLimitChecker: ThrottleForNormalize
   gitHubPluginConfig:
-    hookUrl: "http://10.96.45.111:8080github-webhook/"
+    hookUrl: "http://10.110.221.162:8080github-webhook/"
   junitTestResultStorage:
     storage: "file"
   location:
     adminAddress: "address not configured yet <nobody@nowhere>"
-    url: "http://10.96.45.111:8080"
+    url: "http://10.110.221.162:8080"
   mailer:
     charset: "UTF-8"
     useSsl: false
@@ -322,7 +322,7 @@ unclassified:
     installations:
     - credentialsId: "sonar"
       name: "sonarqube"
-      serverUrl: "http://10.111.8.74:9000"
+      serverUrl: "http://10.103.30.118:9000"
       triggers:
         skipScmCause: false
         skipUpstreamCause: false
