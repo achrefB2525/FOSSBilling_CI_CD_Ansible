@@ -75,11 +75,7 @@
         java -jar {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkins-cli.jar
         -s {{ jenkins_url }}
         -auth admin:{{ jenkins_password }}
-<<<<<<< HEAD
         install-plugin    kubernetes-cli
-=======
-        install-plugin   kubernetes-cli
->>>>>>> ee340b94d0b614703553d7fb701c451c52e8e848
       args:
         executable: /bin/bash
 
