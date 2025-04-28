@@ -9,7 +9,7 @@ credentials:
           - string:
               id: "dockerhub"
               scope: GLOBAL
-              secret: "16/10Nikomik??"
+              secret: ""
 jenkins:
   authorizationStrategy:
     globalMatrix:
