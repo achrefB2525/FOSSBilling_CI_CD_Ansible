@@ -1,0 +1,17 @@
+- include_tasks: crio_common.yml
+
+
+- include_tasks: common.yml
+
+- include_tasks: master.yml
+  when: inventory_hostname in groups['master']
+
+- include_tasks: workers.yml
+  when: inventory_hostname in groups['workers']
+
+- name: Supprimer la configuration sudo de l'utilisateur achref
+  become: yes
+  file:
+    path: /etc/sudoers.d/achref
+    state: absent
+

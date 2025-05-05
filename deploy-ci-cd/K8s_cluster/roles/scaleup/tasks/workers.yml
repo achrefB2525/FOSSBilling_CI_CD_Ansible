@@ -1,0 +1,13 @@
+- name: Changer le propriétaire de kubeadm pour l'utilisateur achref
+  shell: chown achref:achref $(which kubeadm)
+
+- name: Donner les permissions d'exécution à kubeadm pour achref
+  shell: chmod +x $(which kubeadm)
+
+- name: Debug join command
+  debug:
+    var: hostvars['master']['join_cmd']
+
+- name: Join worker nodes to cluster
+  shell: "{{ hostvars['master']['join_cmd'] }} --ignore-preflight-errors=all"
+

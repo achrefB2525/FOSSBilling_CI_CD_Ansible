@@ -1,0 +1,96 @@
+- name: Générer les entrées à ajouter dans /etc/hosts
+  set_fact:
+    hosts_entries: |
+        {% for host in groups['all'] %}
+        {{ hostvars[host]['ansible_host'] }} {{ host }} {{ host }}
+        {% endfor %}
+
+
+- name: Ajouter les entrées dans /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    block: "{{ hosts_entries }}"
+    marker: "# {mark} ajout automatique par Ansible"
+
+
+
+- name: Create apt keyring directory if needed (Ubuntu 22.04+)
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: 0755
+
+- name: Add Kubernetes GPG key
+  apt_key:
+    url: https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key
+    state: present
+    keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+- name: Add Kubernetes apt repository (v1.33)
+  apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.33/deb/ /
+    state: present
+    filename: kubernetes.list
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install Kubernetes packages (version exacte à vérifier)
+  apt:
+    name:
+      - kubelet=1.33.0-1.1
+      - kubeadm=1.33.0-1.1
+    state: present
+    update_cache: yes
+    allow_unauthenticated: no  # Optionnel, à retirer si la clé est bien ajoutée
+
+- name: Install Kubernetes packages (version exacte à vérifier)
+  apt:
+    name:
+      - kubectl=1.33.0-1.1
+    state: present
+    update_cache: yes
+    allow_unauthenticated: no
+  when: inventory_hostname == 'master'
+
+- name: Hold Kubernetes packages
+  shell: apt-mark hold {{ item }}
+  loop:
+    - kubelet
+    - kubeadm
+    - kubectl
+
+- name: Disable swap
+  shell: swapoff -a && sed -i '/swap/d' /etc/fstab
+  become: yes
+
+- name: Enable IP forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    state: present
+    reload: yes
+  become: yes
+
+- name: Autoriser port 6443 (Kubernetes API server)
+  become: yes
+  ufw:
+    rule: allow
+    port: 6443
+    proto: tcp
+
+- name: Autoriser port 10250 (Kubelet)
+  become: yes
+  ufw:
+    rule: allow
+    port: 10250
+    proto: tcp
+
+- name: Autoriser port 8472 (Flannel VXLAN)
+  become: yes
+  ufw:
+    rule: allow
+    port: 8472
+    proto: udp
+

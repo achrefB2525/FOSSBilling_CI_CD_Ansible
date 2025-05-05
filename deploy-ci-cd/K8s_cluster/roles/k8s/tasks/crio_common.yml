@@ -1,0 +1,88 @@
+- name: Installer les dépendances système
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: yes
+
+- name: Installer runc (prérequis pour CRI-O)
+  apt:
+    name: runc
+    state: present
+
+- name: Ajouter la clé GPG de CRI-O
+  apt_key:
+    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.28/xUbuntu_22.04/Release.key
+    state: present
+    keyring: /usr/share/keyrings/libcontainers-archive-keyring.gpg
+
+- name: Ajouter le dépôt CRI-O
+  copy:
+    dest: /etc/apt/sources.list.d/cri-o.list
+    content: |
+      deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.28/xUbuntu_22.04/ /
+    mode: '0644'
+
+- name: Mettre à jour le cache APT
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Installer CRI-O
+  apt:
+    name: cri-o
+    state: present
+
+- name: Créer le répertoire pour le lien symbolique runc
+  file:
+    path: /usr/lib/cri-o-runc/sbin
+    state: directory
+    mode: '0755'
+
+- name: Créer lien symbolique pour runc
+  file:
+    src: /usr/bin/runc
+    dest: /usr/lib/cri-o-runc/sbin/runc
+    state: link
+    force: yes
+
+- name: Déployer la configuration CRI-O
+  template:
+    src:  templates/criotemplate.conf.j2 
+    dest: /etc/crio/crio.conf
+    mode: 0644
+
+- name: Démarrer CRI-O
+  systemd:
+    name: crio
+    enabled: yes
+    state: started
+
+- name: Installer crictl
+  get_url:
+    url: https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.33.0/crictl-v1.33.0-linux-amd64.tar.gz
+    dest: /tmp/crictl.tar.gz
+
+- name: Extraire crictl
+  unarchive:
+    src: /tmp/crictl.tar.gz
+    dest: /usr/local/bin/
+    remote_src: yes
+
+- name: Rendre crictl exécutable
+  file:
+    path: /usr/local/bin/crictl
+    mode: '0755'
+    state: file
+
+- name: Changer le propriétaire du socket CRI-O
+  file:
+    path: /var/run/crio/crio.sock
+    owner: achref
+    group: achref
+    mode: '0660'
+

@@ -1,0 +1,18 @@
+- include_tasks: crio_common.yml
+
+
+- include_tasks: common.yml
+
+- name: Générer la commande de join sur le master
+  shell: kubeadm token create --print-join-command
+  register: join_command
+  when: inventory_hostname in groups['master']
+
+- include_tasks: workers.yml
+
+- name: Supprimer la configuration sudo de l'utilisateur achref
+  become: yes
+  file:
+    path: /etc/sudoers.d/achref
+    state: absent
+
