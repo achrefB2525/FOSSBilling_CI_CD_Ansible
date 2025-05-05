@@ -1,0 +1,6 @@
+- name: Setup Kubernetes Cluster
+  hosts: all
+  become: yes
+  roles:
+    - k8s
+

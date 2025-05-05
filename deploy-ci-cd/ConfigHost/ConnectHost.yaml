@@ -1,0 +1,52 @@
+---
+- name: Automatiser la configuration SSH pour Ansible et accorder des privilèges sudo
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Vérifier si la clé privée existe déjà
+      stat:
+        path: "{{ ssh_key_path }}"
+      register: ssh_key_stat
+      delegate_to: localhost
+
+    - name: Générer une clé SSH si elle n'existe pas
+      command: ssh-keygen -t rsa -b 4096 -f "{{ ssh_key_path }}" -N ""
+      when: not ssh_key_stat.stat.exists
+      delegate_to: localhost
+
+    - name: Lire la clé publique générée
+      slurp:
+        src: "{{ ssh_key_path }}.pub"
+      register: ssh_pub_key
+      delegate_to: localhost
+
+    - name: Ajouter la clé publique à authorized_keys sur la machine distante
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ ssh_pub_key.content | b64decode }}"
+
+    - name: Configurer sudo pour l'utilisateur achref
+      become: yes
+      lineinfile:
+        path: /etc/sudoers.d/achref
+        create: yes
+        state: present
+        mode: '0440'
+        line: 'achref ALL=(ALL) NOPASSWD:ALL'
+
+    - name: Vérifier les privilèges sudo de l'utilisateur achref
+      become: yes
+      command: sudo -v
+      register: sudo_check
+      ignore_errors: yes
+
+    - name: Afficher un message si l'utilisateur achref a les privilèges sudo
+      debug:
+        msg: "L'utilisateur achref peut exécuter des commandes sudo sans mot de passe."
+      when: sudo_check.rc == 0
+
+    - name: Afficher un message si l'utilisateur achref ne peut pas exécuter sudo
+      debug:
+        msg: "L'utilisateur achref n'a pas les privilèges sudo sans mot de passe."
+      when: sudo_check.rc != 0
+

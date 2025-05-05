@@ -14,28 +14,33 @@
     name: runc
     state: present
 
-- name: Ajouter la clé GPG de CRI-O
-  apt_key:
-    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.28/xUbuntu_22.04/Release.key
-    state: present
-    keyring: /usr/share/keyrings/libcontainers-archive-keyring.gpg
 
-- name: Ajouter le dépôt CRI-O
-  copy:
-    dest: /etc/apt/sources.list.d/cri-o.list
-    content: |
-      deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg] https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.28/xUbuntu_22.04/ /
-    mode: '0644'
+- name: Copier le script d'installation de CRI-O sur le worker
+  ansible.builtin.copy:
+    src: templates/crio_setup.sh
+    dest: /tmp/crio_setup.sh
+    mode: '0755'
+
+- name: Exécuter le script d'installation CRI-O
+  ansible.builtin.shell: /tmp/crio_setup.sh
 
 - name: Mettre à jour le cache APT
   apt:
     update_cache: yes
     cache_valid_time: 3600
 
+
+- name: Mettre à jour les paquets APT
+  ansible.builtin.apt:
+    update_cache: yes
+
+
 - name: Installer CRI-O
   apt:
     name: cri-o
     state: present
+
+
 
 - name: Créer le répertoire pour le lien symbolique runc
   file:
