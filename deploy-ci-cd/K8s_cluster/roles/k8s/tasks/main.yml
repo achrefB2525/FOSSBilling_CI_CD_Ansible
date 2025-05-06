@@ -9,7 +9,7 @@
 - include_tasks: workers.yml
   when: inventory_hostname in groups['workers']
 
-- name: Supprimer la configuration sudo de l'utilisateur {{ ansible_user }}
+- name: Supprimer la configuration sudo de l'utilisateur "{{ ansible_user }}"
   become: yes
   file:
     path: /etc/sudoers.d/"{{ ansible_user }}"
