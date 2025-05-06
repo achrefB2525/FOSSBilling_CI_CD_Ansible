@@ -9,9 +9,9 @@
 - include_tasks: workers.yml
   when: inventory_hostname in groups['workers']
 
-- name: Supprimer la configuration sudo de l'utilisateur achref
+- name: Supprimer la configuration sudo de l'utilisateur {{ ansible_user }}
   become: yes
   file:
-    path: /etc/sudoers.d/achref
+    path: /etc/sudoers.d/{{ ansible_user }}
     state: absent
 
