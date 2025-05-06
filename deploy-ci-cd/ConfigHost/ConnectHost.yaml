@@ -25,28 +25,28 @@
         user: "{{ ansible_user }}"
         key: "{{ ssh_pub_key.content | b64decode }}"
 
-    - name: Configurer sudo pour l'utilisateur achref
+    - name: Configurer sudo pour l'utilisateur {{ ansible_user }}
       become: yes
       lineinfile:
-        path: /etc/sudoers.d/achref
+        path: /etc/sudoers.d/{{ ansible_user }}
         create: yes
         state: present
         mode: '0440'
-        line: 'achref ALL=(ALL) NOPASSWD:ALL'
+        line: '{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL'
 
-    - name: Vérifier les privilèges sudo de l'utilisateur achref
+    - name: Vérifier les privilèges sudo de l'utilisateur {{ ansible_user }}
       become: yes
       command: sudo -v
       register: sudo_check
       ignore_errors: yes
 
-    - name: Afficher un message si l'utilisateur achref a les privilèges sudo
+    - name: Afficher un message si l'utilisateur {{ ansible_user }} a les privilèges sudo
       debug:
-        msg: "L'utilisateur achref peut exécuter des commandes sudo sans mot de passe."
+        msg: "L'utilisateur {{ ansible_user }} peut exécuter des commandes sudo sans mot de passe."
       when: sudo_check.rc == 0
 
-    - name: Afficher un message si l'utilisateur achref ne peut pas exécuter sudo
+    - name: Afficher un message si l'utilisateur {{ ansible_user }} ne peut pas exécuter sudo
       debug:
-        msg: "L'utilisateur achref n'a pas les privilèges sudo sans mot de passe."
+        msg: "L'utilisateur {{ ansible_user }} n'a pas les privilèges sudo sans mot de passe."
       when: sudo_check.rc != 0
 
