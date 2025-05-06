@@ -13,6 +13,6 @@
 - name: Supprimer la configuration sudo de l'utilisateur {{ ansible_user }}
   become: yes
   file:
-    path: /etc/sudoers.d/{{ ansible_user }}
+    path: /etc/sudoers.d/"{{ ansible_user }}"
     state: absent
 
