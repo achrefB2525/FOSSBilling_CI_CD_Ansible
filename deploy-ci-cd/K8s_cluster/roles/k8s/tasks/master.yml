@@ -1,3 +1,12 @@
+- name: Installer les dépendances système
+      apt:
+        name:
+          - python3-pip
+          - conntrack
+          - socat
+          - open-iscsi
+          - openjdk-17-jdk
+        state: present
 
 - name: Create kubeadm config file
   template:
@@ -40,6 +49,15 @@
   become_user: "{{ ansible_user }}"
   when: inventory_hostname == 'master'
 
+- name: Apply  longhorn
+  command: kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.8.1/deploy/longhorn.yaml
+  environment:
+    KUBECONFIG: /home/{{ ansible_user }}/.kube/config
+  become: yes
+  become_user: "{{ ansible_user }}"
+  when: inventory_hostname == 'master'
+
+
 
 - name: Export kubeconfig to environment (optional)
   lineinfile:
@@ -59,3 +77,6 @@
 - name: Set join command fact
   set_fact:
     join_cmd: "{{ join_output.stdout }}"
+
+- name: Install Helm using snap
+  command: snap install helm --classic

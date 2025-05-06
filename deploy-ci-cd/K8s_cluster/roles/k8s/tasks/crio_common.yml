@@ -14,6 +14,11 @@
     name: runc
     state: present
 
+- name: Activer et démarrer iscsid
+  systemd:
+    name: iscsid
+    enabled: yes
+    state: started
 
 - name: Copier le script d'installation de CRI-O sur le worker
   ansible.builtin.copy:

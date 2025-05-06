@@ -3,6 +3,9 @@
   hosts: localhost
   become: false
   tasks:
+*   - name: StorgeClass
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/playbooks/storge/StorgeClass.yaml
+
     - name: Déployer Jenkins depuis jenkinsdeploy.yaml
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/jenkins-conf/jenkinsdeploy.yaml
 

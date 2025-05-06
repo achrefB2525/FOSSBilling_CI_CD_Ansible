@@ -1,19 +1,4 @@
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: sonar-pv
-  labels:
-    app: sonar
-spec:
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: manual  # This should match the PVC's storage class
-  hostPath:
-    path: /mnt/data/sonar   # Ensure this path exists on the host
----
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -22,10 +7,10 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: StorgeCiCd
   resources:
     requests:
       storage: 1Gi
-  storageClassName: manual  # Must match the PV's storage class
 ---
 apiVersion: v1
 kind: ConfigMap

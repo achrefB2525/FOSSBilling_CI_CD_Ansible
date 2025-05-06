@@ -13,18 +13,6 @@ metadata:
   name: jenkins
 ---
 apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: jenkins-pv
-spec:
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /mnt/data
----
-apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: jenkins-pvc
@@ -32,6 +20,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: StorgeCiCd
   resources:
     requests:
       storage: 5Gi
