@@ -87,7 +87,7 @@
 - name: Changer le propriétaire du socket CRI-O
   file:
     path: /var/run/crio/crio.sock
-    owner: achref
-    group: achref
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     mode: '0660'
 
