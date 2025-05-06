@@ -1,5 +1,58 @@
 - name: Setup Kubernetes Cluster
   hosts: all
   become: yes
+  tasks:
+    - name: Générer les entrées à ajouter dans /etc/hosts
+      set_fact:
+        hosts_entries: >-
+          {% if inventory_hostname in groups['NewHost'] %}
+            {% for host in groups['OldHost'] %}
+            {{ hostvars[host]['ansible_host'] }} {{ host }}
+            {% endfor %}
+            {{ hostvars[inventory_hostname]['ansible_host'] }} {{ inventory_hostname }}
+          {% elif inventory_hostname in groups['OldHost'] %}
+            {% for host in groups['NewHost'] %}
+            {{ hostvars[host]['ansible_host'] }} {{ host }}
+            {% endfor %}
+          {% endif %}
+
+    - name: Ajouter les lignes
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ item }}"
+        state: present
+      loop: "{{ hosts_entries.splitlines() }}"
+      when: hosts_entries is defined
+
+- name: Setup Kubernetes Cluster (New nodes only)
+  hosts: NewHost
+  become: yes
   roles:
     - scaleup
+
+- name: Tâches spécifiques au master 
+  hosts: all
+  become: yes
+  tasks:
+    - name: Générer la commande de join
+      shell: kubeadm token create --print-join-command
+      register: join_result
+      when: inventory_hostname == 'master'
+
+    - name: Sauvegarder la commande de join dans les hostvars
+      set_fact:
+        join_cmd: "{{ join_result.stdout }}"
+      when: inventory_hostname == 'master'
+
+- name: Setup Kubernetes Cluster (New nodes only)
+  hosts: all
+  become: yes
+  tasks:
+    - include_tasks: roles/scaleup/tasks/workers.yml
+      when: inventory_hostname in groups['NewHost']
+
+    - name: Supprimer la configuration sudo de l'utilisateur "{{ ansible_user }}"
+      file:
+        path: "/etc/sudoers.d/{{ ansible_user }}"
+        state: absent
+
