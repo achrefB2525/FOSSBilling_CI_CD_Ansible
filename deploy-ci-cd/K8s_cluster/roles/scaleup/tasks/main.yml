@@ -10,7 +10,7 @@
 
 - include_tasks: workers.yml
 
-- name: Supprimer la configuration sudo de l'utilisateur {{ ansible_user }}
+- name: Supprimer la configuration sudo de l'utilisateur "{{ ansible_user }}"
   become: yes
   file:
     path: /etc/sudoers.d/"{{ ansible_user }}"
