@@ -6,6 +6,7 @@
       - curl
       - gnupg
       - lsb-release
+      - open-iscsi
     state: present
     update_cache: yes
 
