@@ -4,7 +4,6 @@
           - python3-pip
           - conntrack
           - socat
-          - open-iscsi
           - openjdk-17-jdk
         state: present
 
