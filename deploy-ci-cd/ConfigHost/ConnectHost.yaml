@@ -1,61 +1,57 @@
 ---
-- name: Automatiser la configuration SSH pour Ansible et accorder des privilèges sudo
+- name: Configuration SSH et sudo automatisée
   hosts: all
-  gather_facts: no
+  gather_facts: false
+
   tasks:
-    - name: Créer le répertoire défini par ssh_local
-      ansible.builtin.file:
-        path: "{{ ssh_local }}"
-        state: directory
-        mode: '0755'
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      delegate_to: localhost
-  
-    - name: Vérifier si la clé privée existe déjà
-      stat:
-        path: "{{ ssh_local }}"
-      register: ssh_key_stat
-      delegate_to: localhost
+    # Génération de la clé SSH sur le master (dans ~/.ssh)
+    - name: Générer clé SSH sur master si inexistante
+      block:
+        - name: Vérifier existence clé SSH
+          stat:
+            path: ~/.ssh/id_rsa
+          register: key_check
+          delegate_to: "{{ groups['master'][0] }}"
 
-    - name: Générer une clé SSH si elle n'existe pas
-      command: ssh-keygen -t rsa -b 4096 -f "{{ ssh_local }}" -N ""
-      when: not ssh_key_stat.stat.exists
-      delegate_to: localhost
+        - name: Créer répertoire .ssh
+          file:
+            path: ~/.ssh
+            state: directory
+            mode: '0700'
+            owner: "{{ ansible_user }}"
+          when: not key_check.stat.exists
+          delegate_to: "{{ groups['master'][0] }}"
 
-    - name: Lire la clé publique générée
+        - name: Générer clé RSA
+          command: ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+          args:
+            creates: ~/.ssh/id_rsa
+          when: not key_check.stat.exists
+          delegate_to: "{{ groups['master'][0] }}"
+      run_once: yes
+
+    # Récupération et déploiement de la clé publique
+    - name: Lire clé publique du master
       slurp:
-        src: "{{ ssh_key_path }}.pub"
-      register: ssh_pub_key
-      delegate_to: localhost
+        src: ~/.ssh/id_rsa.pub
+      register: master_pub_key
+      delegate_to: "{{ groups['master'][0] }}"
+      run_once: yes
 
-    - name: Ajouter la clé publique à authorized_keys sur la machine distante
+    - name: Déployer clé sur tous les nœuds
       authorized_key:
         user: "{{ ansible_user }}"
-        key: "{{ ssh_pub_key.content | b64decode }}"
-      
-    - name: Configurer sudo pour l'utilisateur "{{ ansible_user }}"
+        key: "{{ master_pub_key.content | b64decode }}"
+        manage_dir: yes
+        path: ~/.ssh/authorized_keys
+
+    # Configuration sudo sécurisée
+    - name: Configurer sudo sans mot de passe
       become: yes
-      lineinfile:
-        path: /etc/sudoers.d/"{{ ansible_user }}"
-        create: yes
-        state: present
+      copy:
+        dest: /etc/sudoers.d/99_{{ ansible_user }}_nopasswd
+        content: "{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL"
         mode: '0440'
-        line: '{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL'
+        validate: 'visudo -cf %s'
 
-    - name: Vérifier les privilèges sudo de l'utilisateur {{ ansible_user }}
-      become: yes
-      command: sudo -v
-      register: sudo_check
-      ignore_errors: yes
-
-    - name: Afficher un message si l'utilisateur {{ ansible_user }} a les privilèges sudo
-      debug:
-        msg: "L'utilisateur {{ ansible_user }} peut exécuter des commandes sudo sans mot de passe."
-      when: sudo_check.rc == 0
-
-    - name: Afficher un message si l'utilisateur {{ ansible_user }} ne peut pas exécuter sudo
-      debug:
-        msg: "L'utilisateur {{ ansible_user }} n'a pas les privilèges sudo sans mot de passe."
-      when: sudo_check.rc != 0
 
