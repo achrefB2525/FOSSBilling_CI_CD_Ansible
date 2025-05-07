@@ -3,15 +3,7 @@
   hosts: all
   gather_facts: no
   tasks:
-    - name: Créer le répertoire défini par ssh_local
-      ansible.builtin.file:
-        path: "{{ ssh_local }}"
-        state: directory
-        mode: '0755'
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      delegate_to: localhost
-  
+
     - name: Vérifier si la clé privée existe déjà
       stat:
         path: "{{ ssh_local }}"
@@ -34,10 +26,10 @@
         user: "{{ ansible_user }}"
         key: "{{ ssh_pub_key.content | b64decode }}"
       
-    - name: Configurer sudo pour l'utilisateur "{{ ansible_user }}"
+    - name: Configurer sudo pour l'utilisateur {{ ansible_user }}
       become: yes
       lineinfile:
-        path: /etc/sudoers.d/"{{ ansible_user }}"
+        path: /etc/sudoers.d/{{ ansible_user }}
         create: yes
         state: present
         mode: '0440'
