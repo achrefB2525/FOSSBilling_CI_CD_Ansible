@@ -46,12 +46,12 @@
         path: ~/.ssh/authorized_keys
 
     # Configuration sudo sécurisée
-    - name: Configurer sudo sans mot de passe
+    - name: Configurer sudo pour l'utilisateur {{ ansible_user }}
       become: yes
-      copy:
-        dest: /etc/sudoers.d/99_{{ ansible_user }}_nopasswd
-        content: "{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL"
+      lineinfile:
+        path: /etc/sudoers.d/{{ ansible_user }}
+        create: yes
+        state: present
         mode: '0440'
-        validate: 'visudo -cf %s'
-
+        line: '{{ ansible_user }} ALL=(ALL) NOPASSWD:ALL'
 
