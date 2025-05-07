@@ -3,7 +3,7 @@
   hosts: localhost
   become: false
   tasks:
-*   - name: StorgeClass
+    - name: StorgeClass
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/playbooks/storge/StorgeClass.yaml
 
     - name: Déployer Jenkins depuis jenkinsdeploy.yaml
@@ -29,12 +29,12 @@
       become_user: achref
       become: false
 
-
-    - name: Activer l'addon Ingress de Minikube
-      shell: minikube addons enable ingress
+    - name: Déployer le Ingress NGINX Controller
+      shell: |
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.0/deploy/static/provider/cloud/deploy.yaml
       register: result_ingress_enable
-      failed_when: "'Error' in result_ingress_enable.stderr"
-      changed_when: "'enabled' in result_ingress_enable.stdout"
+      failed_when: result_ingress_enable.rc != 0
+      changed_when: "'configured' in result_ingress_enable.stdout or 'created' in result_ingress_enable.stdout"
 
     - name: Apply Cert-Manager CRDs
       command: kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.2/cert-manager.crds.yaml
@@ -81,13 +81,6 @@
 
     - name: Inclure les tâches de déploiement de PostgreSQL
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/sonarqubedeploy/postgres.yaml
-      
-    - name: Créer le dossier /mnt/data/sonar sans owner
-      become: true
-      ansible.builtin.file:
-        path: /mnt/data/sonar
-        state: directory
-        mode: '0755'
 
 
     - name: Déployer SonarQube depuis sonar.yaml
@@ -98,7 +91,7 @@
 
     - name: Ajouter un délai de 60 secondes
       pause:
-        seconds: 80
+        seconds: 180
 
     - name: Inclure les tâches pour la gestion des plugins Jenkins
       include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/mangerPlugins.yml"

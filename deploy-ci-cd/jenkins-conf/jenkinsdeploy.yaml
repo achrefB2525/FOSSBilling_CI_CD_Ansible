@@ -17,13 +17,16 @@ kind: PersistentVolumeClaim
 metadata:
   name: jenkins-pvc
   namespace: jenkins
+
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: StorgeCiCd
   resources:
     requests:
-      storage: 5Gi
+      storage: 1Gi
+  volumeMode: Filesystem
+  storageClassName: storage-cicd
+ 
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -85,6 +88,9 @@ spec:
         - name: jenkins-init-scripts
           configMap:
             name: jenkins-init-groovy
+      securityContext:
+        runAsUser: 1000 
+        fsGroup: 1000  
 ---
 apiVersion: v1
 kind: Service

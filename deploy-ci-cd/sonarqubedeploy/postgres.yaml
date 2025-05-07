@@ -11,7 +11,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: StorgeCiCd
+  storageClassName: storage-cicd
   resources:
     requests:
       storage: 5Gi
