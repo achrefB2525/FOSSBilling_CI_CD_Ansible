@@ -50,6 +50,7 @@
 
 - name: Apply  longhorn
   command: kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
+
   environment:
     KUBECONFIG: /home/{{ ansible_user }}/.kube/config
   become: yes
