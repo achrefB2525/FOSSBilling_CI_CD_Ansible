@@ -1,0 +1,6 @@
+- name: Apply  openebs
+  command: kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
+  
+- name: Apply  JIRA openebs
+  command: kubectl apply -f https://openebs.github.io/charts/jiva-operator.yaml
+  
