@@ -1,0 +1,12 @@
+piVersion: openebs.io/v1alpha1
+kind: JivaVolumePolicy
+metadata:
+  name: jiva-policy
+  namespace: openebs
+spec:
+  target:
+    replicationFactor: 3
+    resources: {}
+  replica:
+    resources: {}
+
