@@ -11,6 +11,27 @@
     path: /etc/hosts
     block: "{{ hosts_entries }}"
     marker: "# {mark} ajout automatique par Ansible"
+    
+- name: Installer open-iscsi
+  apt:
+    name: open-iscsi
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Activer et démarrer le service iscsid
+  systemd:
+    name: iscsid
+    enabled: yes
+    state: started
+  become: true
+
+- name: Activer et démarrer le service open-iscsi
+  systemd:
+    name: open-iscsi
+    enabled: yes
+    state: started
+  become: true
 
 
 
