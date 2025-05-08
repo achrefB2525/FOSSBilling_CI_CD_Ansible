@@ -48,13 +48,6 @@
   become_user: "{{ ansible_user }}"
   when: inventory_hostname == 'master'
 
-- name: Apply  openebs
-  command: kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
-  
-- name: Apply  JIRA openebs
-  command: kubectl apply -f https://openebs.github.io/charts/jiva-operator.yaml
-  
-
 
 
 - name: Export kubeconfig to environment (optional)
