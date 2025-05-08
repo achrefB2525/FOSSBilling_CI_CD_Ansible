@@ -3,6 +3,8 @@
   hosts: localhost
   become: false
   tasks:
+    - name: StorgePolicy 
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/playbooks/storge/JivaVolumePolicy.yaml
     - name: StorgeClass
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/playbooks/storge/StorgeClass.yaml
 
