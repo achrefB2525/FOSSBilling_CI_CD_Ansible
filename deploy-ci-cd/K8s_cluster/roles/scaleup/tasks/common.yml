@@ -3,6 +3,27 @@
     path: /etc/apt/keyrings
     state: directory
     mode: 0755
+    
+- name: Installer open-iscsi
+  apt:
+    name: open-iscsi
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Activer et démarrer le service iscsid
+  systemd:
+    name: iscsid
+    enabled: yes
+    state: started
+  become: true
+
+- name: Activer et démarrer le service open-iscsi
+  systemd:
+    name: open-iscsi
+    enabled: yes
+    state: started
+  become: true
 
 - name: Add Kubernetes GPG key
   apt_key:
