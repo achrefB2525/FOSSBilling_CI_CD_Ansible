@@ -48,14 +48,12 @@
   become_user: "{{ ansible_user }}"
   when: inventory_hostname == 'master'
 
-- name: Apply  longhorn
+- name: Apply  openebs
   command: kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
-
-  environment:
-    KUBECONFIG: /home/{{ ansible_user }}/.kube/config
-  become: yes
-  become_user: "{{ ansible_user }}"
-  when: inventory_hostname == 'master'
+  
+- name: Apply  JIRA openebs
+  command: kubectl apply -f https://openebs.github.io/charts/jiva-operator.yaml
+  
 
 
 
