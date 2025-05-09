@@ -17,7 +17,7 @@
       
     - name: Ajouter un délai de 240 secondes
       pause:
-        seconds: 240
+        seconds: 340
 
 
     - name: Récupérer l'IP ClusterIP du service Jenkins
