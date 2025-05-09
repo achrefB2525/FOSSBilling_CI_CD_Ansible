@@ -4,6 +4,22 @@ metadata:
   name: testing
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-pv
+  labels:
+    app: postgres
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data/postgres
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
@@ -11,10 +27,10 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: storage-cicd
   resources:
     requests:
       storage: 5Gi
+  storageClassName: manual
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -80,4 +96,3 @@ spec:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: postgres-pvc
-
