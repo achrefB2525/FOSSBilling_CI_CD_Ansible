@@ -1,6 +1,11 @@
-- name: Apply  openebs
+- name: Apply OpenEBS
   command: kubectl apply -f https://openebs.github.io/charts/openebs-operator.yaml
-  
+  environment:
+    KUBECONFIG: /home/fossbiling/.kube/config
+
 - name: Apply  JIRA openebs
   command: kubectl apply -f https://openebs.github.io/charts/jiva-operator.yaml
+  environment:
+    KUBECONFIG: /home/fossbiling/.kube/config
+
   
