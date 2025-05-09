@@ -14,6 +14,11 @@
 
     - name: ADD Role to Jenkins
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/roleManager/Jenkinsrole.yaml
+      
+    - name: Ajouter un délai de 240 secondes
+      pause:
+        seconds: 240
+
 
     - name: Récupérer l'IP ClusterIP du service Jenkins
       command: kubectl get svc jenkins -n jenkins -o jsonpath='{.spec.clusterIP}'
