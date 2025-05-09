@@ -3,21 +3,17 @@ kind: Namespace
 metadata:
   name: testing
 ---
-apiVersion: v1
-kind: PersistentVolume
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
-  name: postgres-pv
-  labels:
-    app: postgres
-spec:
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: manual
-  hostPath:
-    path: /mnt/data/postgres
+  name: storage-postgres
+provisioner: jiva.csi.openebs.io
+allowVolumeExpansion: true
+parameters:
+  cas-type: "jiva"
+  policy: "jiva-policy"
+  replicaCount: "2"
+  storage: "10Gi"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -25,12 +21,12 @@ metadata:
   name: postgres-pvc
   namespace: testing
 spec:
+  storageClassName: storage-postgres
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 5Gi
-  storageClassName: manual
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -40,9 +36,9 @@ metadata:
   labels:
     app: postgres
 data:
-  POSTGRESQL_USERNAME: sonar_user
-  POSTGRESQL_DATABASE: sonar_db
-  POSTGRESQL_PASSWORD: S0N4RQUB3
+  POSTGRES_DB: sonar_db
+  POSTGRES_USER: sonar_user
+  POSTGRES_PASSWORD: S0N4RQUB3
 ---
 apiVersion: v1
 kind: Service
@@ -52,9 +48,10 @@ metadata:
   labels:
     app: postgres
 spec:
+  type: ClusterIP
   ports:
     - port: 5432
-      name: postgres
+      targetPort: 5432
   selector:
     app: postgres
 ---
@@ -76,22 +73,33 @@ spec:
         app: postgres
     spec:
       securityContext:
-        runAsUser: 0  # Exécuter en tant qu'utilisateur root
+        fsGroup: 1001
+        runAsUser: 1001
       containers:
         - name: postgres
-          image: bitnami/postgresql
+          image: bitnami/postgresql:16
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432
           env:
             - name: ALLOW_EMPTY_PASSWORD
-              value: "yes"
+              value: "no"
+            - name: PGDATA
+              value: /bitnami/postgresql/data
           envFrom:
             - configMapRef:
                 name: postgres-config
           volumeMounts:
             - name: postgres-data
               mountPath: /bitnami/postgresql
+              subPath: pgdata
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 250m
+            limits:
+              memory: 1Gi
+              cpu: 500m
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
