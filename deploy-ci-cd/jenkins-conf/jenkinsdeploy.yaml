@@ -12,6 +12,17 @@ kind: Namespace
 metadata:
   name: jenkins
 ---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: jenkins-jiva
+provisioner: jiva.csi.openebs.io
+parameters:
+  replicaCount: "2"
+  storagePool: default
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -25,7 +36,7 @@ spec:
     requests:
       storage: 6Gi
   volumeMode: Filesystem
-  storageClassName: storage-cicd
+  storageClassName: jenkins-jiva
  
 ---
 apiVersion: v1
@@ -119,4 +130,3 @@ spec:
       targetPort: 50000
   selector:
     app: jenkins
-
