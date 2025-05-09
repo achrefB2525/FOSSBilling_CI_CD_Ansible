@@ -8,6 +8,9 @@
 
 - include_tasks: workers.yml
   when: inventory_hostname in groups['workers']
+  
+- include_tasks: openebs.yml
+  when: inventory_hostname in groups['master']
 
 - name: Supprimer la configuration sudo de l'utilisateur "{{ ansible_user }}"
   become: yes
