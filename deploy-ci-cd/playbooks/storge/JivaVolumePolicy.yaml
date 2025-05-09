@@ -5,7 +5,7 @@ metadata:
   namespace: openebs
 spec:
   target:
-    replicationFactor: 3
+    replicationFactor: 2
     resources: {}
   replica:
     resources: {}
