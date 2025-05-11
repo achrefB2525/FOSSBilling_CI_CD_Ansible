@@ -3,6 +3,8 @@
   hosts: localhost
   become: false
   tasks:
+    - name: Networrk 
+      command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/playbooks/network/IPPool.yaml
     - name: StorgePolicy 
       command: kubectl apply -f {{ deploy_path }}/deploy-ci-cd/playbooks/storge/JivaVolumePolicy.yaml
       
