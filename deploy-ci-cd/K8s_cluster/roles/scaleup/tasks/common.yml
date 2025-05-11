@@ -10,6 +10,13 @@
     state: present
     update_cache: yes
   become: true
+  
+- name: Supprimer le fichier de verrouillage iSCSI
+  ansible.builtin.file:
+    path: /var/lock/iscsi_lock
+    state: absent
+  ignore_errors: yes
+  become: true
 
 - name: Activer et démarrer le service iscsid
   systemd:
@@ -18,12 +25,6 @@
     state: started
   become: true
 
-- name: Activer et démarrer le service open-iscsi
-  systemd:
-    name: open-iscsi
-    enabled: yes
-    state: started
-  become: true
 
 - name: Add Kubernetes GPG key
   apt_key:
@@ -50,21 +51,13 @@
     update_cache: yes
     allow_unauthenticated: no  # Optionnel, à retirer si la clé est bien ajoutée
 
-- name: Install Kubernetes packages (version exacte à vérifier)
-  apt:
-    name:
-      - kubectl=1.33.0-1.1
-    state: present
-    update_cache: yes
-    allow_unauthenticated: no
-  when: inventory_hostname == 'master'
+
 
 - name: Hold Kubernetes packages
   shell: apt-mark hold {{ item }}
   loop:
     - kubelet
     - kubeadm
-    - kubectl
 
 - name: Disable swap
   shell: swapoff -a && sed -i '/swap/d' /etc/fstab
