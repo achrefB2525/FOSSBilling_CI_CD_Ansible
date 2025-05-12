@@ -11,6 +11,11 @@
   
 - include_tasks: openebs.yml
   when: inventory_hostname in groups['master']
+  
+- name: Networrk 
+  command: kubectl apply -f templates/IPPool.yaml
+  when: inventory_hostname in groups['master']
+      
 
 - name: Supprimer la configuration sudo de l'utilisateur "{{ ansible_user }}"
   become: yes
