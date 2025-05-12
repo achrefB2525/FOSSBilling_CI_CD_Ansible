@@ -1,12 +1,4 @@
-# ClusterIssuer pour cert-manager (auto-signé)
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: selfsigned-issuer
-spec:
-  selfSigned: {}
----
-# PVC pour SonarQube
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -20,7 +12,6 @@ spec:
     requests:
       storage: 4Gi
 ---
-# ConfigMap pour SonarQube
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -93,7 +84,6 @@ spec:
           persistentVolumeClaim:
             claimName: sonar-pvc
 ---
-# Service SonarQube
 apiVersion: v1
 kind: Service
 metadata:
@@ -109,4 +99,5 @@ spec:
       name: sonar
   selector:
     app: sonar
+    
 
