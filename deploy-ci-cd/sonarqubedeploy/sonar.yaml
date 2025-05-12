@@ -109,47 +109,4 @@ spec:
       name: sonar
   selector:
     app: sonar
----
-# Certificat TLS pour SonarQube
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: sonar-cert
-  namespace: testing
-spec:
-  secretName: sonar-tls
-  issuerRef:
-    name: selfsigned-issuer
-    kind: ClusterIssuer
-  commonName: sonar.local
-  dnsNames:
-    - sonar.local
-  duration: 8760h     # 1 an
-  renewBefore: 360h   # 15 jours
----
-# Ingress SonarQube HTTPS
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: sonar-ingress
-  namespace: testing
-  annotations:
-    cert-manager.io/cluster-issuer: "selfsigned-issuer"
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  ingressClassName: nginx
-  tls:
-    - hosts:
-        - sonar.local
-      secretName: sonar-tls
-  rules:
-    - host: sonar.local
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: sonar-svc
-                port:
-                  number: 9000
+
