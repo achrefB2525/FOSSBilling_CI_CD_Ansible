@@ -15,6 +15,10 @@
 - name: Networrk 
   command: kubectl apply -f templates/IPPool.yaml
   when: inventory_hostname in groups['master']
+  
+- name: RestartCoredns 
+  command: kubectl rollout restart deployment coredns -n kube-system
+  when: inventory_hostname in groups['master']
       
 
 - name: Supprimer la configuration sudo de l'utilisateur "{{ ansible_user }}"
