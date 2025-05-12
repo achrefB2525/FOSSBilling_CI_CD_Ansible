@@ -67,7 +67,7 @@
         jenkins_url: "{{ jenkins_url }}"
         jenkins_tunnel: "{{ jenkins_jnlp_ip.stdout }}"
         sonarqube_url: "{{ sonar_url }}"
-        kubernetes_url: "{{host_ip}}:8443"
+        kubernetes_url: "{{host_ip}}:6443"
 
 
     - name: Appliquer la configuration Jenkins avec Jenkins CLI
