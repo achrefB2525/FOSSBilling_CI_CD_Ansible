@@ -12,29 +12,33 @@ kind: Namespace
 metadata:
   name: jenkins
 ---
-apiVersion: v1
-kind: PersistentVolume
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
-  name: jenkins-pv
-spec:
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  hostPath:
-    path: /mnt/data
+  name: jenkins-jiva
+provisioner: jiva.csi.openebs.io
+parameters:
+  replicaCount: "2"
+  storagePool: default
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: jenkins-pvc
   namespace: jenkins
+
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 6Gi
+  volumeMode: Filesystem
+  storageClassName: jenkins-jiva
+ 
 ---
 apiVersion: v1
 kind: ConfigMap
