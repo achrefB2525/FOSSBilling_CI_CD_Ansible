@@ -90,7 +90,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        sh 'docker build -t achrefdoce/fossbilling:v1 .'
+                        sh 'buildah  build -t achrefdoce/fossbilling:v1 .'
                     }
                 }
             }
@@ -112,8 +112,8 @@ pipeline {
                     script {
                         def dockerHubImageName = "achrefdoce/fossbilling:v1"
                         withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
-                            sh "docker login -u achrefdoce -p ${dockerhub}"
-                            sh "docker push ${dockerHubImageName}"
+                            sh "buildah  login -u achrefdoce -p ${dockerhub}"
+                            sh "buildah  push ${dockerHubImageName}"
                         }
                     }
                 }
