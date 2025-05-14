@@ -12,8 +12,7 @@
 - include_tasks: openebs.yml
   when: inventory_hostname in groups['master']
   
-- name: Networrk 
-  command: kubectl apply -f templates/IPPool.yaml
+- include_tasks: network.yml
   when: inventory_hostname in groups['master']
   
 - name: RestartCoredns 
