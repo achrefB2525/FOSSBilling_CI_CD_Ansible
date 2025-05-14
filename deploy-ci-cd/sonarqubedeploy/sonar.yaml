@@ -45,10 +45,6 @@ spec:
       labels:
         app: sonar
     spec:
-      securityContext:
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 0
       initContainers:
         - name: init
           image: busybox:1.34
