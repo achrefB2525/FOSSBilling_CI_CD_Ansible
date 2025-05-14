@@ -1,0 +1,19 @@
+- name: Copy IPPool manifest to control node
+  copy:
+    src: templates/IPPool.yml
+    dest: /tmp/IPPool.yml
+
+- name: Apply IPPool manifest
+  command: kubectl apply -f /tmp/IPPool.yml
+  environment:
+    KUBECONFIG: /home/{{ ansible_user }}/.kube/config
+  become: yes
+  become_user: "{{ ansible_user }}"
+
+- name: Restart CoreDNS
+  command: kubectl rollout restart deployment coredns -n kube-system
+  environment:
+    KUBECONFIG: /home/{{ ansible_user }}/.kube/config
+  become: yes
+  become_user: "{{ ansible_user }}"
+
