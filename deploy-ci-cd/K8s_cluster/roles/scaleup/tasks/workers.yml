@@ -1,5 +1,5 @@
     - name: Changer le propriétaire de kubeadm pour l'utilisateur achref
-      shell: chown achref:achref $(which kubeadm)
+      shell: chown  "{{ ansible_user }}":"{{ ansible_user }}" $(which kubeadm)
 
     - name: Donner les permissions d'exécution à kubeadm pour achref
       shell: chmod +x $(which kubeadm)
