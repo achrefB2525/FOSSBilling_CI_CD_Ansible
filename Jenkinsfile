@@ -90,7 +90,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        sh 'buildah  build --isolation chroot -t achrefdoce/fossbilling:v1 .'
+                        sh 'buildah  build  --isolation=mount -t achrefdoce/fossbilling:v1 .'
                     }
                 }
             }
