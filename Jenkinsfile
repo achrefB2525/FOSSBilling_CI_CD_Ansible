@@ -106,19 +106,21 @@ pipeline {
             }
         }
 
-        stage('Push to Docker Hub') {
-            steps {
-                container('php-cli') {
-                    script {
-                        def dockerHubImageName = "achrefdoce/fossbilling:v1"
-                        withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
-                            sh "buildah login -u achrefdoce -p ${dockerhub}"
-                            sh "buildah push ${dockerHubImageName}"
-                        }
-                    }
+stage('Push to Docker Hub') {
+    steps {
+        container('php-cli') {
+            script {
+                def dockerHubImageName = "achrefdoce/fossbilling:v1"
+                withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+                    sh '''
+                        buildah login -u achrefdoce -p "$dockerhub" docker.io
+                        buildah push achrefdoce/fossbilling:v1
+                    '''
                 }
             }
         }
+    }
+}
 
         stage('Déploiement avec kubectl') {
   steps {
