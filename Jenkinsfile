@@ -90,7 +90,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        sh 'buildah  build  --isolation=chroot -t docker.io/achrefdoce/fossbilling:v1.'
+                        sh 'buildah  build  --isolation=chroot -t achrefdoce/fossbilling:v1.'
                     }
                 }
             }
@@ -100,7 +100,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        sh 'trivy image docker.io/achrefdoce/fossbilling:v1'
+                        sh 'trivy image achrefdoce/fossbilling:v1'
                     }
                 }
             }
@@ -110,11 +110,10 @@ stage('Push to Docker Hub') {
     steps {
         container('php-cli') {
             script {
-                def dockerHubImageName = "docker.io/achrefdoce/fossbilling:v1"
                 withCredentials([string(credentialsId: 'dockerhub', variable: 'DOCKERHUB_TOKEN')]) {
                     sh '''
                         buildah login -u achrefdoce -p "$DOCKERHUB_TOKEN" docker.io
-                        buildah push docker.io/achrefdoce/fossbilling:v1
+                        buildah push achrefdoce/fossbilling:v1
                     '''
                 }
             }
