@@ -3,17 +3,20 @@ pipeline {
 
     stages {
 
-stage('Deploy with Helm') {
-  steps {
-    sh '''
-     /usr/local/bin/helm upgrade --install fossbilling-release ./chart --namespace fossbilling-namespace \
-        --set env.db.MYSQL_ROOT_PASSWORD=monNouveauRootPass \
-        --set env.db.MYSQL_DATABASE=maBase \
-        --set env.db.MYSQL_USER=monUser \
-        --set env.db.MYSQL_PASSWORD=monPass
-    '''
-  }
-}
+    stage('Deploy with Helm') {
+      steps {
+        container('php-cli') {
+          sh '''
+            helm version
+            helm upgrade --install fossbilling-release ./chart --namespace fossbilling-namespace \
+              --set env.db.MYSQL_ROOT_PASSWORD=monNouveauRootPass \
+              --set env.db.MYSQL_DATABASE=maBase \
+              --set env.db.MYSQL_USER=monUser \
+              --set env.db.MYSQL_PASSWORD=monPass
+          '''
+        }
+      }
+    }
 
 
         stage('Clone Repository') {
