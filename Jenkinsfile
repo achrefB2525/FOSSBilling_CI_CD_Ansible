@@ -152,19 +152,23 @@ stage('Push to Docker Hub') {
     }
 }
 
-
-   stage('Deploy with Helm') {
+stage('Deploy with Helm') {
       steps {
         container('php-cli') {
-          sh '''
-           helm upgrade --install fossbilling-release  ./deployment \
-            --namespace fossbilling-namespace \
-            --create-namespace \
-            --set env.db.MYSQL_ROOT_PASSWORD=monNouveauRootPass \
-            --set env.db.MYSQL_DATABASE=maBase \
-            --set env.db.MYSQL_USER=monUser \
-            --set env.db.MYSQL_PASSWORD=monPass
-          '''
+          withCredentials([
+            string(credentialsId: 'mysql-root-password', variable: 'MYSQL_ROOT_PASSWORD'),
+            string(credentialsId: 'mysql-password', variable: 'MYSQL_PASSWORD')
+          ]) {
+            sh """
+              helm upgrade --install fossbilling-release ./deployment \
+                --namespace fossbilling-namespace \
+                --create-namespace \
+                --set env.db.MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+                --set env.db.MYSQL_DATABASE=${DB_NAME} \
+                --set env.db.MYSQL_USER=${DB_USER} \
+                --set env.db.MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            """
+          }
         }
       }
     }
