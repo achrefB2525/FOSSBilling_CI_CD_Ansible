@@ -7,7 +7,7 @@ stage('Deploy with Helm') {
   steps {
     sh '''
       export PATH=$HOME/.local/bin:$PATH
-      helm upgrade --install fossbilling-release ./chart --namespace fossbilling-namespace \
+     /usr/local/bin/helm upgrade --install fossbilling-release ./chart --namespace fossbilling-namespace \
         --set env.db.MYSQL_ROOT_PASSWORD=monNouveauRootPass \
         --set env.db.MYSQL_DATABASE=maBase \
         --set env.db.MYSQL_USER=monUser \
