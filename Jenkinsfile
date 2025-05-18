@@ -2,18 +2,6 @@ pipeline {
     agent { label 'php-agent' }
 
     stages {
-stage('Install Helm') {
-  steps {
-    sh '''
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-chmod 700 get_helm.sh
-HELM_INSTALL_DIR=$HOME/.local/bin ./get_helm.sh
-export PATH=$HELM_INSTALL_DIR:$PATH
-helm version
-
-    '''
-  }
-}
 
 stage('Deploy with Helm') {
   steps {
