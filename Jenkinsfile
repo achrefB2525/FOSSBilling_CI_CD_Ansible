@@ -3,21 +3,7 @@ pipeline {
 
     stages {
 
-    stage('Deploy with Helm') {
-      steps {
-        container('php-cli') {
-          sh '''
-            helm version
-            helm upgrade --install fossbilling-release ./chart --namespace fossbilling-namespace \
-              --set env.db.MYSQL_ROOT_PASSWORD=monNouveauRootPass \
-              --set env.db.MYSQL_DATABASE=maBase \
-              --set env.db.MYSQL_USER=monUser \
-              --set env.db.MYSQL_PASSWORD=monPass
-          '''
-        }
-      }
-    }
-
+  
 
         stage('Clone Repository') {
             steps {
@@ -181,18 +167,20 @@ stage('Push to Docker Hub') {
 }
 
 
-        stage('Déploiement avec kubectl') {
-  steps {
-        container('php-cli') { 
-                sh '''
-                curl -L -o output.yaml https://raw.githubusercontent.com/achrefB2525/FOSSBilling_CI_CD_Ansible/main/output.yaml
-
-                kubectl apply -f output.yaml
-            '''
-
+   stage('Deploy with Helm') {
+      steps {
+        container('php-cli') {
+          sh '''
+           helm upgrade --install fossbilling-release  ./deployment \
+            --namespace fossbilling-namespace \
+            --create-namespace \
+            --set env.db.MYSQL_ROOT_PASSWORD=monNouveauRootPass \
+            --set env.db.MYSQL_DATABASE=maBase \
+            --set env.db.MYSQL_USER=monUser \
+            --set env.db.MYSQL_PASSWORD=monPass
+          '''
         }
-    }
-
+      }
     }
         }
     }
