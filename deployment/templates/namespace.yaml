@@ -1,6 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: fossbilling-namespace
-  labels:
-    name: fossbilling-namespace
+  name: {{ .Values.namespace }}
