@@ -2,16 +2,31 @@ pipeline {
     agent { label 'php-agent' }
 
     stages {
-          stage('Test Helm') {
-            steps {
-                sh '''
-                    echo "PATH=$PATH"
-                    export PATH=$PATH:/usr/local/bin
-                    which helm
-                    helm version
-                '''
-            }
-        }
+stage('Install Helm') {
+  steps {
+    sh '''
+      curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+      chmod 700 get_helm.sh
+      ./get_helm.sh
+      export PATH=$HOME/.local/bin:$PATH
+      helm version
+    '''
+  }
+}
+
+stage('Deploy with Helm') {
+  steps {
+    sh '''
+      export PATH=$HOME/.local/bin:$PATH
+      helm upgrade --install fossbilling-release ./chart --namespace fossbilling-namespace \
+        --set env.db.MYSQL_ROOT_PASSWORD=monNouveauRootPass \
+        --set env.db.MYSQL_DATABASE=maBase \
+        --set env.db.MYSQL_USER=monUser \
+        --set env.db.MYSQL_PASSWORD=monPass
+    '''
+  }
+}
+
 
         stage('Clone Repository') {
             steps {
