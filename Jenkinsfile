@@ -9,6 +9,13 @@ pipeline {
             }
         }
 
+        stage('Afficher le contenu du répertoire') {
+            steps {
+                echo 'Liste des fichiers dans le répertoire de travail :'
+                sh 'ls -l'
+            }
+        }
+    
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies using Composer...'
