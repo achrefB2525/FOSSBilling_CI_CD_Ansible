@@ -34,7 +34,7 @@
       </userRemoteConfigs>
       <branches>
         <hudson.plugins.git.BranchSpec>
-          <name>main</name> <!-- Use the specified branch -->
+          <name>Kubernetes</name> <!-- Use the specified branch -->
         </hudson.plugins.git.BranchSpec>
       </branches>
       <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
