@@ -11,9 +11,7 @@ pipeline {
         stage('Récupérer dossier deployment') {
             steps {
                 sh '''
-                    rm -rf deployment
 
-                    # Initialiser un dépôt vide
                     git init temp-repo
                     cd temp-repo
 
