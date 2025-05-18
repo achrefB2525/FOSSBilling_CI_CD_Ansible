@@ -40,6 +40,7 @@ pipeline {
             steps {
                 echo 'Liste des fichiers dans le répertoire de travail :'
                 sh '''
+                cd deployment
                 pwd
                 ls -l
                 '''
