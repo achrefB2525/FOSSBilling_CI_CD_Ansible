@@ -10,6 +10,14 @@ credentials:
               id: "dockerhub"
               scope: GLOBAL
               secret: "{{ repo_password }}"
+          - string:
+              id: "mysql-root-password"
+              scope: GLOBAL
+              secret: "{{fossbiling_database_root_password }}"
+          - string:
+              id: "mysql-password"
+              scope: GLOBAL
+              secret: "{{ fossbiling_mysql_password}}"
 jenkins:
   authorizationStrategy:
     globalMatrix:
@@ -136,6 +144,13 @@ jenkins:
                 command:
                   - cat
                 tty: true
+                securityContext:
+                  privileged: true
+                  runAsUser: 0
+                  capabilities:
+                    add:
+                    - SYS_ADMIN
+                    - MKNOD
                 volumeMounts:
                   - name: workspace-volume
                     mountPath: /var/www/composer
@@ -144,7 +159,8 @@ jenkins:
 
             volumes:
               - name: workspace-volume
-                emptyDir: {}
+                emptyDir:
+                  sizeLimit: 8Gi
               - name: containers-storage
                 emptyDir: {} 
             restartPolicy: Never
