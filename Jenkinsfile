@@ -36,17 +36,20 @@ pipeline {
             }
         }
     
-        stage('Afficher le contenu du répertoire') {
+      stage('Déployer avec Helm') {
             steps {
-                echo 'Liste des fichiers dans le répertoire de travail :'
-                sh '''
-                cd deployment
-                pwd
-                ls -l
-                '''
+                dir('deployment') {
+                    sh """
+                    helm upgrade --install fossbilling-release ./chart \
+                      --namespace fossbilling-namespace \
+                      --set env.db.MYSQL_ROOT_PASSWORD=monNouveauRootPass \
+                      --set env.db.MYSQL_DATABASE=maBase \
+                      --set env.db.MYSQL_USER=monUser \
+                      --set env.db.MYSQL_PASSWORD=monPass
+                    """
+                }
             }
         }
-    
         stage('Install Dependencies') {
             steps {
                 echo 'Installing dependencies using Composer...'
