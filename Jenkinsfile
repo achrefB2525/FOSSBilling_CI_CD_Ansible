@@ -2,12 +2,43 @@ pipeline {
     agent { label 'php-agent' }
 
     stages {
+
+  
+
         stage('Clone Repository') {
             steps {
                 echo 'Cloning the repository...'
                 git url: 'https://github.com/FOSSBilling/FOSSBilling.git', branch: 'main'
             }
         }
+        stage('Récupérer dossier deployment') {
+            steps {
+                sh '''
+
+                    git init temp-repo
+                    cd temp-repo
+
+                    # Ajouter le remote
+                    git remote add origin https://github.com/achrefB2525/FOSSBilling_CI_CD_Ansible.git
+
+                    # Activer le mode sparse-checkout
+                    git config core.sparseCheckout true
+
+                    # Définir le dossier à récupérer
+                    echo "deployment/" >> .git/info/sparse-checkout
+
+                    # Récupérer uniquement le dossier depuis la branche Kubernetes
+                    git pull origin Kubernetes
+
+                    # Déplacer le dossier dans le workspace principal
+                    mv deployment ../
+
+                    cd ..
+                    rm -rf temp-repo
+                '''
+            }
+        }
+    
 
         stage('Install Dependencies') {
             steps {
@@ -90,7 +121,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        sh 'buildah build -t achrefdoce/fossbilling:v1 .'
+                        sh 'buildah  build  --isolation=chroot -t achrefdoce/fossbilling:v1 .'
                     }
                 }
             }
@@ -100,7 +131,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        sh 'trivy image achrefdoce/fossbilling:v1'
+                        sh 'trivy image --timeout 10m achrefdoce/fossbilling:v1'
                     }
                 }
             }
@@ -110,10 +141,9 @@ stage('Push to Docker Hub') {
     steps {
         container('php-cli') {
             script {
-                def dockerHubImageName = "achrefdoce/fossbilling:v1"
-                withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
+                withCredentials([string(credentialsId: 'dockerhub', variable: 'DOCKERHUB_TOKEN')]) {
                     sh '''
-                        buildah login -u achrefdoce -p "$dockerhub" docker.io
+                        buildah login -u achrefdoce -p "$DOCKERHUB_TOKEN" docker.io
                         buildah push achrefdoce/fossbilling:v1
                     '''
                 }
@@ -122,19 +152,25 @@ stage('Push to Docker Hub') {
     }
 }
 
-        stage('Déploiement avec kubectl') {
-  steps {
-        container('php-cli') { 
-                sh '''
-                curl -L -o output.yaml https://raw.githubusercontent.com/achrefB2525/FOSSBilling_CI_CD_Ansible/main/output.yaml
-
-                kubectl apply -f output.yaml
-            '''
-
+stage('Deploy with Helm') {
+      steps {
+        container('php-cli') {
+          withCredentials([
+            string(credentialsId: 'mysql-root-password', variable: 'MYSQL_ROOT_PASSWORD'),
+            string(credentialsId: 'mysql-password', variable: 'MYSQL_PASSWORD')
+          ]) {
+            sh """
+              helm upgrade --install fossbilling-release ./deployment \
+                --namespace fossbilling-namespace \
+                --create-namespace \
+                --set env.db.MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+                --set env.db.MYSQL_DATABASE=${DB_NAME} \
+                --set env.db.MYSQL_USER=${DB_USER} \
+                --set env.db.MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            """
+          }
+        }
+      }
+    }
         }
     }
-
-    }
-        }
-    }
-
