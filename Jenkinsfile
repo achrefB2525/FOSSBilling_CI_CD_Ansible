@@ -12,7 +12,10 @@ pipeline {
         stage('Afficher le contenu du répertoire') {
             steps {
                 echo 'Liste des fichiers dans le répertoire de travail :'
-                sh 'ls -l'
+                sh '''
+                pwd
+                ls -l
+                '''
             }
         }
     
