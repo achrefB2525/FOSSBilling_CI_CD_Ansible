@@ -40,6 +40,7 @@ pipeline {
             steps {
                 dir('deployment') {
                     sh """
+                    export PATH=$PATH:/usr/local/bin
                     helm upgrade --install fossbilling-release ./chart \
                       --namespace fossbilling-namespace \
                       --set env.db.MYSQL_ROOT_PASSWORD=monNouveauRootPass \
