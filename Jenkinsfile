@@ -8,7 +8,36 @@ pipeline {
                 git url: 'https://github.com/FOSSBilling/FOSSBilling.git', branch: 'main'
             }
         }
+        stage('Récupérer dossier deployment') {
+            steps {
+                sh '''
+                    rm -rf deployment
 
+                    # Initialiser un dépôt vide
+                    git init temp-repo
+                    cd temp-repo
+
+                    # Ajouter le remote
+                    git remote add origin https://github.com/achrefB2525/FOSSBilling_CI_CD_Ansible.git
+
+                    # Activer le mode sparse-checkout
+                    git config core.sparseCheckout true
+
+                    # Définir le dossier à récupérer
+                    echo "deployment/" >> .git/info/sparse-checkout
+
+                    # Récupérer uniquement le dossier depuis la branche Kubernetes
+                    git pull origin Kubernetes
+
+                    # Déplacer le dossier dans le workspace principal
+                    mv deployment ../
+
+                    cd ..
+                    rm -rf temp-repo
+                '''
+            }
+        }
+    
         stage('Afficher le contenu du répertoire') {
             steps {
                 echo 'Liste des fichiers dans le répertoire de travail :'
