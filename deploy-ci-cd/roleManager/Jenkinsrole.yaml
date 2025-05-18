@@ -1,11 +1,34 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+kind: ClusterRole
 metadata:
-  name: jenkins-role
-  namespace: jenkins
+  name: jenkins-namespaces
 rules:
   - apiGroups: [""]
-    resources: ["pods", "pods/exec", "pods/log", "services", "secrets"]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jenkins-namespaces-binding
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: jenkins
+roleRef:
+  kind: ClusterRole
+  name: jenkins-namespaces
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jenkins-deployer
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log", "pods/exec", "services", "secrets", "configmaps"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   - apiGroups: ["apps"]
     resources: ["deployments"]
@@ -13,41 +36,17 @@ rules:
   - apiGroups: ["networking.k8s.io"]
     resources: ["ingresses"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: jenkins-rolebinding
-  namespace: jenkins
-subjects:
-  - kind: ServiceAccount
-    name: default
-    namespace: jenkins
-roleRef:
-  kind: Role
-  name: jenkins-role
-  apiGroup: rbac.authorization.k8s.io
----
-# Pour clusterissuers (obligé de créer un ClusterRole et ClusterRoleBinding)
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: jenkins-clusterissuer-role
-rules:
-  - apiGroups: ["cert-manager.io"]
-    resources: ["clusterissuers"]
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: jenkins-clusterissuer-rolebinding
+  name: jenkins-deployer-binding
 subjects:
   - kind: ServiceAccount
     name: default
     namespace: jenkins
 roleRef:
   kind: ClusterRole
-  name: jenkins-clusterissuer-role
+  name: jenkins-deployer
   apiGroup: rbac.authorization.k8s.io
-
