@@ -2,6 +2,17 @@ pipeline {
     agent { label 'php-agent' }
 
     stages {
+          stage('Test Helm') {
+            steps {
+                sh '''
+                    echo "PATH=$PATH"
+                    export PATH=$PATH:/usr/local/bin
+                    which helm
+                    helm version
+                '''
+            }
+        }
+
         stage('Clone Repository') {
             steps {
                 echo 'Cloning the repository...'
