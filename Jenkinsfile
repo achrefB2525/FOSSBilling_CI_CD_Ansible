@@ -164,8 +164,8 @@ stage('Deploy with Helm') {
                 --namespace fossbilling-namespace \
                 --create-namespace \
                 --set env.db.MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
-                --set env.db.MYSQL_DATABASE=${DB_NAME} \
-                --set env.db.MYSQL_USER=${DB_USER} \
+                --set env.db.MYSQL_DATABASE=fossbilling \
+                --set env.db.MYSQL_USER=fossbillinguser \
                 --set env.db.MYSQL_PASSWORD=${MYSQL_PASSWORD}
             """
           }
