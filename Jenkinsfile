@@ -131,7 +131,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        sh 'trivy image --timeout 10m achrefdoce/fossbilling:v1'
+                        sh 'trivy image --timeout 10m fossbilling1/fossbilling:v1'
                     }
                 }
             }
