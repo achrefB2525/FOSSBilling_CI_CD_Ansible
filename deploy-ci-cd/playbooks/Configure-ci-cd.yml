@@ -1,7 +1,13 @@
 ---
 - name: Playbook principal pour configurer les outils CI/CD
   hosts: localhost
-  gather_facts: no
+  gather_facts: no 
+  vars:
+    services:
+      - { namespace: default, name: prometheus-grafana, hostname: grafana.local }
+      - { namespace: testing, name: sonar-svc, hostname: sonar.local }
+      - { namespace: jenkins, name: jenkins, hostname: jenkins.local }
+
   vars_files:
     - vars/sonarvars.yaml
 
@@ -37,5 +43,24 @@
         var: jenkins_url
 
     - name: Inclure les tâches de configuration Jenkins
-      include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/ConfigureJenkins.yml"
+      include_tasks: "{{ deploy_path }}/deploy-ci-cd/jenkins-conf/ConfigureJenkins.yml"  
+      
 
+    - name: Récupérer les IPs des services
+      shell: "kubectl get svc -n {{ item.namespace }} {{ item.name }} -o jsonpath='{.spec.clusterIP}'"
+      register: svc_ips
+      loop: "{{ services }}"
+      changed_when: false
+
+    - name: Construire les lignes à ajouter dans /etc/hosts
+      set_fact:
+        host_entries: "{{ host_entries | default([]) + [ {'ip': item.stdout, 'host': item.item.hostname} ] }}"
+      loop: "{{ svc_ips.results }}"
+
+    - name: Ajouter chaque IP dans /etc/hosts si absente
+      become: true
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ item.ip }} {{ item.host }}"
+        state: present
+      loop: "{{ host_entries }}"
