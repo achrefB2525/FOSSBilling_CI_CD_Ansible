@@ -90,7 +90,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        sh 'docker build -t achrefdoce/fossbilling:v1 .'
+                        sh 'docker build -t fossbilling1/fossbilling:v1 .'
                     }
                 }
             }
@@ -100,7 +100,7 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        sh 'trivy image achrefdoce/fossbilling:v1'
+                        sh 'trivy image fossbilling1/fossbilling:v1'
                     }
                 }
             }
@@ -110,9 +110,9 @@ pipeline {
             steps {
                 container('php-cli') {
                     script {
-                        def dockerHubImageName = "achrefdoce/fossbilling:v1"
+                        def dockerHubImageName = "fossbilling1/fossbilling:v1"
                         withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
-                            sh "docker login -u achrefdoce -p ${dockerhub}"
+                            sh "docker login -u fossbilling1 -p ${dockerhub}"
                             sh "docker push ${dockerHubImageName}"
                         }
                     }
